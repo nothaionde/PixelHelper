@@ -1,0 +1,128 @@
+﻿namespace Turbo.Plugins.MyPluginsLocation //<MyPluginsLocation> is the name of the folder in TurboHUD\plugins\ where this plugin file is located
+{
+	using Turbo.Plugins.Default;
+	using Turbo.Plugins.Razor.Movable; //referencing the Movable library
+	using SharpDX.DirectInput; //Key, for defining KeyEvents for the key event handler
+
+	public class MyMovablePlugin : BasePlugin, IMovable, IMovableKeyEventHandler //implements the IMovable interface and its key handler interface
+	{
+		//fields go here
+		public IKeyEvent MyHotkeyTest { get; set; }
+		
+		public MyMovablePlugin()
+		{
+			Enabled = true;
+			
+			//initialization can go here if it doesn't reference Hud
+		}
+
+		public override void Load(IController hud)
+		{
+			base.Load(hud);
+			
+			//initialization can go here if it does reference Hud
+			
+			//IKeyEvent IInputController.CreateKeyEvent(bool isPressed, SharpDX.DirectInput.Key key, bool controlPressed, bool altPressed, bool shiftPressed)
+			MyHotkeyTest = Hud.Input.CreateKeyEvent(true, Key.D, true, false, false) //Ctrl+D
+		}
+		
+		//required for IMovable, this function is called when MovableController first acknowledges this plugin's existence
+		public void OnRegister(MovableController mover)
+		{
+			//Initialize position and dimension elements of as many movable areas you want. The resize mode options are:
+			//ResizeMode.Off - no resize
+			//ResizeMode.On - free resize
+			//ResizeMode.FixedRatio - keep the ratios of the starting dimensions
+			//ResizeMode.Horizontal - resize horizontally only
+			//ResizeMode.Vertical - resize vertically only
+			
+			//IUIElement.Rectangle works at this point in execution, so you can reference existing UI elements to calculate starting positions relative to them
+			
+			mover.CreateArea(
+				this,
+				"Text", //area name
+				new RectangleF(x1, y1, w1, h1), //position + dimensions
+				true, //enabled at start? (visible upon creation)
+				true, //save to config file?
+				ResizeMode.Off //resize mode
+			);
+			
+			mover.CreateArea(
+				this,
+				"Bars", //area name
+				new RectangleF(x2, y2, w2, h2), //position + dimensions
+				true, //enabled at start? (visible upon creation)
+				true, //save to config file?
+				ResizeMode.Horizontal, //resize mode
+				ClipState.AfterClip //specify a different clipstate instead of the default (ClipState.BeforeClip) if desired
+			);
+			
+			//creating a "temporary" movable area that is deleted when the disable command (Ctrl+X) is applied to it
+			var temporaryArea = mover.CreateArea(
+				this,
+				"Temporary", //area name
+				new RectangleF(x3, y3, w3, h3), //position + dimensions
+				true, //enabled at start? (visible upon creation)
+				false, //save to config file?
+				ResizeMode.FixedRatio //resize mode
+			);
+			temporaryArea.DeleteOnDisable = true;
+		}
+
+		//required for IMovable, this is called whenever MovableController wants this plugin to draw something on the screen
+		public void PaintArea(MovableController mover, MovableArea area, float deltaX = 0, float deltaY = 0)
+		{
+			//if the area is currently being moved (on the cursor) from its original position, deltaX and deltaY will be > 0
+			//the movable area dimensions you can reference for drawing on the screen
+			var x = area.Rectangle.X + deltaX;
+			var y = area.Rectangle.Y + deltaY;
+			var width = area.Rectangle.Width;
+			var height = area.Rectangle.Height;
+			
+			//figure out which area is supposed to be drawn
+			if (area.Name == "Text")
+			{
+				
+			}
+			else if (area.Name == "Bars")
+			{
+				
+			}
+			else if (area.Name == "Temporary")
+			{
+				
+			}
+			
+			//MovableController mover can be used to get some status information about the area
+			if (mover.CursorPluginArea == area)
+			{
+				//this area is currently picked up by the cursor
+			}
+			
+			if (mover.HoveredPluginArea == area)
+			{
+				//the mouse cursor is currently hovering over this area
+			}
+			
+			if (mover.ResizePluginArea == area)
+			{
+				//this area is currently being resized
+			}
+			
+			//MovableController mover can be used to delete this area on the fly
+			mover.DeleteArea(area);
+		}
+		
+		//required for IMovableKeyEventHandler
+		public void OnKeyEvent(MovableController mover, IKeyEvent keyEvent, MovableArea area)
+		{
+			//this is similar to IKeyEventHandler.OnKeyEvent(IKeyEvent keyEvent) except it only triggers when in Edit Mode and this particular plugin is currently hovered over or picked up by the cursor
+			
+			//example hotkey check
+			if (keyEvent.IsPressed && MyHotkeyTest.Matches(keyEvent))
+			{
+				//Ctrl+D was pressed
+			}
+		}
+	}
+}
