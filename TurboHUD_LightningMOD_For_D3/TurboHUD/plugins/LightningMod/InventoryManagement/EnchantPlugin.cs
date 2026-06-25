@@ -82,7 +82,7 @@
         {
             base.Load(hud);
 
-            ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.R, false, false, false);
+            ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.F3, false, false, false);
 
             vendorPage = Hud.Render.RegisterUiElement("Root.NormalLayer.vendor_dialog_mainPage", null, null);
             enchantDialog = Hud.Render.RegisterUiElement("Root.NormalLayer.vendor_dialog_mainPage.enchant_dialog", null, null);

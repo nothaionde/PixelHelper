@@ -1,7 +1,7 @@
-ï»¿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
-using Turbo.Plugins.glq;
+using Turbo.Plugins.glq;						
 
 namespace Turbo.Plugins.LightningMod
 {
@@ -18,49 +18,49 @@ namespace Turbo.Plugins.LightningMod
             base.Load(hud);
             AssignedSnoPower = Hud.Sno.SnoPowers.Crusader_AkaratsChampion;
 
-            CreateCastRule()//ä¸€èˆ¬è§„åˆ™
+            CreateCastRule()//Ò»°ã¹æÔò
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfCanCastSimple().ThenContinueElseNoCast()
                 .IfTrue(ctx => !isSanGuang()).ThenContinueElseNoCast()
-                .IfSpecificBuffIsAboutToExpire(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting, 0, 500, 2000, true).ThenCastElseContinue()//å‡è€—å¡”å³å°†ç»“æŸå‰æ–½æ”¾
-                .IfEnoughMonstersNearby(ctx => 100, ctx => 1).ThenContinueElseNoCast()
+                .IfSpecificBuffIsAboutToExpire(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting, 0, 500, 2000, true).ThenCastElseContinue()//¼õºÄËþ¼´½«½áÊøÇ°Ê©·Å
+                .IfEnoughMonstersNearby(ctx => 100, ctx => 1).ThenContinueElseNoCast()								
                 .IfTrue(ctx =>
                 {
                     var buff = ctx.Skill.Player.Powers.GetBuff(Hud.Sno.SnoPowers.Crusader_AkaratsChampion.Sno);
                     var remaining = buff?.Active == true ? buff.TimeLeftSeconds[1] : 0.0d;
-                    return remaining <= 1d || ctx.Skill.Rune == 2;//buffå‰©ä½™å°äºŽ1sæˆ–è€…ç¬¦æ–‡ä¸ºé›†ç»“å·ä»¤
+                    return remaining <= 0.2d || ctx.Skill.Rune == 2;//buffÊ£ÓàÐ¡ÓÚ0.2s»òÕß·ûÎÄÎª¼¯½áºÅÁî
                 }).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
                 {
-                    var set = Hud.Game.Me.GetSetItemCount(580748);// é˜¿å…‹æ±—å¥—
-                    return !ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Crusader_SteedCharge.Sno) && (ctx.Skill.Player.Stats.CooldownReduction >= 0.75 || (ctx.Skill.Player.Stats.CooldownReduction >= 0.5 && (set >= 4 || ctx.Hud.Game.Me.Powers.BuffIsActive(402459) || ctx.Hud.Game.Me.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.AkaratsAwakening.Sno))));//CDRå¤§äºŽ75æˆ–ï¼ˆ50ä¸”å¸¦äº†é»„é“æˆ–é˜¿å¡æ‹‰ç‰¹é¡¿æ‚Ÿæˆ–é˜¿å…‹æ±—4ä»¶ï¼‰
-                }).ThenCastElseContinue()
+                    var set = Hud.Game.Me.GetSetItemCount(580748);// °¢¿Ëº¹Ì×
+                    return !ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Crusader_SteedCharge.Sno) && (ctx.Skill.Player.Stats.CooldownReduction >= 0.75 || (ctx.Skill.Player.Stats.CooldownReduction >= 0.5 && (set >= 4 || ctx.Hud.Game.Me.Powers.BuffIsActive(402459) || ctx.Hud.Game.Me.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.AkaratsAwakening.Sno))));//CDR´óÓÚ75»ò£¨50ÇÒ´øÁË»ÆµÀ»ò°¢¿¨À­ÌØ¶ÙÎò»ò°¢¿Ëº¹4¼þ£©
+                }).ThenCastElseContinue()	   
                 .IfTrue(ctx =>
                 {
                     var Crusader_SteedCharge = ctx.Skill.Player.Powers.GetUsedSkill(Hud.Sno.SnoPowers.Crusader_SteedCharge);
-                    bool isNoFatal = (!ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.Crusader_Passive_Indestructible.Sno, 0) || ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.Crusader_Passive_Indestructible.Sno, 1)) &&//æ²¡å¸¦é“èƒ†é’¢å¿ƒæˆ–CDä¸­
-                    ctx.Skill.Rune == 3 &&//å…ˆçŸ¥åŒ–èº«
-                    (ctx.Skill.Player.HeroIsHardcore || ctx.Hud.Avoidance.CurrentValue || ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(20, false) || ctx.Skill.Player.AvoidablesInRange.Any(x => x.AvoidableDefinition.InstantDeath) || ctx.Skill.Player.Powers.CantMove || (Hud.Game.Me.Defense.HealthPct < (Hud.Game.Me.Powers.HealthPotionSkill.IsOnCooldown ? 60 : 30))) &&//ä¸“å®¶æ¨¡å¼æˆ–å±é™©æ—¶
+                    bool isNoFatal = (!ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.Crusader_Passive_Indestructible.Sno, 0) || ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.Crusader_Passive_Indestructible.Sno, 1)) &&//Ã»´øÌúµ¨¸ÖÐÄ»òCDÖÐ
+                    ctx.Skill.Rune == 3 &&//ÏÈÖª»¯Éí
+                    (ctx.Skill.Player.HeroIsHardcore || ctx.Hud.Avoidance.CurrentValue || ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(20, false) || ctx.Skill.Player.AvoidablesInRange.Any(x => x.AvoidableDefinition.InstantDeath) || ctx.Skill.Player.Powers.CantMove || (Hud.Game.Me.Defense.HealthPct < (Hud.Game.Me.Powers.HealthPotionSkill.IsOnCooldown ? 60 : 30))) &&//×¨¼ÒÄ£Ê½»òÎ£ÏÕÊ±
                     (!ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Crusader_SteedCharge.Sno) || (ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Crusader_SteedCharge.Sno) && cando()))
                     ;
                     
                     return isNoFatal ? true : !ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Crusader_SteedCharge.Sno);
-                }).ThenContinueElseNoCast()//ä¼˜å…ˆä¿å‘½
+                }).ThenContinueElseNoCast()//ÓÅÏÈ±£Ãü
                 .IfTrue(ctx =>
                 {
-                    var isDLegacyOfDreams = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.LegacyOfDreamsPrimary.Sno);//æ¢¦ä¹‹é—ç¤¼å®çŸ³
-                    var isAkkhansLeniency = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.AkkhansLeniency.Sno);//é˜¿å…‹æ±—çš„å®½å®¹
-                    var isJekangbord = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Jekangbord.Sno);//æ°ä¼åŽç›¾
-                    return isDLegacyOfDreams && isAkkhansLeniency && isJekangbord && PublicClassPlugin.IsElementReady(ctx.Hud, 0.1, ctx.Skill.Player, 3);//ç«å…ƒç´ çˆ†å‘
-                }).ThenCastElseContinue()
+                    var isDLegacyOfDreams = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.LegacyOfDreamsPrimary.Sno);//ÃÎÖ®ÒÅÀñ±¦Ê¯
+                    var isAkkhansLeniency = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.AkkhansLeniency.Sno);//°¢¿Ëº¹µÄ¿íÈÝ
+                    var isJekangbord = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.Jekangbord.Sno);//½Ü·ü¿²¶Ü
+                    return isDLegacyOfDreams && isAkkhansLeniency && isJekangbord && PublicClassPlugin.IsElementReady(ctx.Hud, 0.1, ctx.Skill.Player, 3);//»ðÔªËØ±¬·¢
+                }).ThenCastElseContinue()						 
                 .IfPrimaryResourcePercentageIsBelow(20).ThenCastElseContinue()
                 .IfEliteOrBossIsNearby(ctx => 40).ThenCastElseContinue()
                 ;
 
-            CreateCastRule()//ä¸‰å…‰è§„åˆ™
+            CreateCastRule()//Èý¹â¹æÔò
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
@@ -78,14 +78,14 @@ namespace Turbo.Plugins.LightningMod
         private bool cando()
         {
             var Crusader_SteedCharge = Hud.Game.Me.Powers.GetUsedSkill(Hud.Sno.SnoPowers.Crusader_SteedCharge);
-            return ((!Hud.Interaction.IsHotKeySet(ActionKey.Move) || (Hud.Interaction.IsHotKeySet(ActionKey.Move) && !Hud.Interaction.IsContinuousActionStarted(ActionKey.Move))) && (Crusader_SteedCharge != null && !Hud.Interaction.IsContinuousActionStarted(Crusader_SteedCharge.Key)));//æœªæŒ‰ä¸‹å¼ºåˆ¶ç§»åŠ¨ä¸”æœªæŒ‰ä½éª‘é©¬
+            return ((!Hud.Interaction.IsHotKeySet(ActionKey.Move) || (Hud.Interaction.IsHotKeySet(ActionKey.Move) && !Hud.Interaction.IsContinuousActionStarted(ActionKey.Move))) && (Crusader_SteedCharge != null && !Hud.Interaction.IsContinuousActionStarted(Crusader_SteedCharge.Key)));//Î´°´ÏÂÇ¿ÖÆÒÆ¶¯ÇÒÎ´°´×¡ÆïÂí
         }
 
         private bool isSanGuang()
         {
-            bool isAegisofValor = Hud.Game.Me.GetSetItemCount(192736) >= 6;//å‹‡æ°”6ä»¶å¥—
-            bool isFateoftheFell = Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.FateOfTheFell.Sno, 0);//å¦–é‚ªå¿…è´¥
-            bool isConventionOfElements = Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.ConventionOfElements.Sno, 0);//å…ƒç´ æˆ’æŒ‡
+            bool isAegisofValor = Hud.Game.Me.GetSetItemCount(192736) >= 6;//ÓÂÆø6¼þÌ×
+            bool isFateoftheFell = Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.FateOfTheFell.Sno, 0);//ÑýÐ°±Ø°Ü
+            bool isConventionOfElements = Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.ConventionOfElements.Sno, 0);//ÔªËØ½äÖ¸
             return isAegisofValor && isFateoftheFell && isConventionOfElements;
         }
     }

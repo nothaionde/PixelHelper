@@ -103,7 +103,7 @@
             SalvageAncient = 1;
             SalvagePrimal = 1;
             SalvageEthereal = 0;
-            SalvagePotion = 0;
+            SalvagePotion = 1;
             SalvageSoulshard = 0;
             SalvageWhisperOfAtonement = false;
             vendorPage = Hud.Render.RegisterUiElement(
@@ -166,56 +166,6 @@
             if (!Hud.Game.IsInGame || !Hud.Game.IsInTown || Hud.Game.IsPaused)
             {
                 return;
-            }
-
-            if (doRepair)
-            {
-                if (VENDOR_MAIN.Visible && VENDOR_TAB_3.Visible)
-                {
-                    if (Hud.Game.CurrentRealTimeMilliseconds - msLapseAction > msLapseMin)
-                    {
-                        msLapseAction = Hud.Game.CurrentRealTimeMilliseconds;
-                        if (Hud.Game.Me.AnimationState == AcdAnimationState.Idle)
-                        {
-                            if (VENDOR_TAB_3.AnimState == 34)
-                            {
-                                if (VENDOR_REPAIRALL.Visible)
-                                {
-                                    var match = Regex.Match(
-                                        VENDOR_REPAIRALL.ReadText(Encoding.UTF8, true),
-                                        @"([0-9]+)"
-                                    );
-                                    if (match.Success && match.Groups[1].Value != "0")
-                                    {
-                                        mouseLClickUiE(VENDOR_REPAIRALL);
-                                    }
-                                    else
-                                    {
-                                        if (AfterRepairGoToSalvageTab)
-                                            TabActive = VENDOR_TAB_2;
-                                        if (TabActive != null)
-                                        {
-                                            mouseLClickUiE(TabActive);
-                                            TabActive = null;
-                                        }
-                                        doRepair = false;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (VENDOR_TAB_0.AnimState == 16)
-                                    TabActive = VENDOR_TAB_0;
-                                else if (VENDOR_TAB_1.AnimState == 13)
-                                    TabActive = VENDOR_TAB_1;
-                                else if (VENDOR_TAB_2.AnimState == 37)
-                                    TabActive = VENDOR_TAB_2;
-                                if (TabActive != null)
-                                    mouseLClickUiE(VENDOR_TAB_3);
-                            }
-                        }
-                    }
-                }
             }
 
             if (!TurnedOn)

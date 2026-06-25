@@ -18,6 +18,7 @@
         public bool PickWhite { get; set; } = true;
         public bool PickBlue { get; set; } = true;
         public bool PickYellow { get; set; } = true;
+        public bool PickDB { get; set; } = true;
         public bool AutoPickupOutTown { get; set; } = true;
         public bool ShowTips { get; set; } = false;
         public bool WhenForceMoveInvalid { get; set; } = true;
@@ -58,6 +59,7 @@
             PickWhite = PixelHelperSettings.Instance.PickWhite;
             PickBlue = PixelHelperSettings.Instance.PickBlue;
             PickYellow = PixelHelperSettings.Instance.PickYellow;
+            PickDB = PixelHelperSettings.Instance.PickDeathBreath;
         }
 
         public void AddWhitelist(params string[] names)
@@ -197,9 +199,9 @@
                 if (DiabolicalChest != null && item.FloorCoordinate.XYDistanceTo(DiabolicalChest.FloorCoordinate) < 10)
                     return false;
                 if (Whitelist.Contains(item.SnoItem.NameLocalized.ToLower()))//白名单物品（比如“团结”）
-                    return true;
+                    return false;
                 if (Whitelist.Contains(item.FullNameLocalized.ToLower()))//白名单物品（比如“太古传奇 团结”）
-                    return true;
+                    return false;
                 if (Blacklist.Contains(item.SnoItem.NameLocalized.ToLower()))//黑名单物品（比如“团结”）
                     return false;
                 if (Blacklist.Contains(item.FullNameLocalized.ToLower()))//黑名单物品（比如“太古传奇 团结”）
@@ -221,7 +223,7 @@
                 if (item.SnoItem.Sno == 2087837753)//死亡之息
                     return PixelHelperSettings.Instance.PickDeathBreath;
                 if (PickCraft && item.SnoItem.NameEnglish == "Ramaladni's Gift" && CalculateStackItemfreeSpace(item, 100))//打孔器
-                    return true;
+                    return false;
 
                 if (PickCraft && item.SnoItem.Code.StartsWith("P72_Soulshard"))//灵魂碎片
                     return true;

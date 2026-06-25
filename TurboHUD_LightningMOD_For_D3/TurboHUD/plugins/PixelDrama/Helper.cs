@@ -22,8 +22,7 @@
           IKeyEventHandler
     {
         public static Helper _helper = null;
-        public string statusText = "N/A";
-        public string debugText = "N/A";
+        public string debugText = "";
         public bool isHelperOn;
         private IController Hud;
         private PixelHelper pixelHelper;
@@ -43,16 +42,10 @@
         private IFont debugFont;
         private HelperState helperState;
         private TownState townState;
-        private GrOrRiftState grOrRiftState;
         public IKeyEvent ToggleKeyEvent { get; set; }
-        protected IUiElement uiJoinPatryAcceptButton;
-        protected IUiElement uiGRmainPage;
         private readonly bool[,] _usedSpaces = new bool[10, 6];
-        private int minimumShardsToGamble = 100;
-        public static bool shouldDisconnect = false;
-        private bool isBotting = true;
-        private int keysToKeep = 1000;
-        private int grLevel = 110;
+        private int minimumShardsToGamble = 50;
+        private bool townInitialized = false;
 
         private enum HelperState
         {
@@ -63,32 +56,14 @@
         private enum TownState
         {
             JustEntered,
+            Teleporting,
             Gambling,
             Salvaging,
-            NoFreeSpace, // No free space in inv with lootfilter. Need to stash items.
+            NoFreeSpace,
             AssigningParagons,
             ClosingRift,
             AutoOpeningRift,
-            Idle, // Idle means if GR or ANY other activity will start - you will accept it. Should not be reached if brother is playing. If it was reached smth happend or stash is full
-            
-        }
-
-        private enum GrOrRiftState
-        {
-            PathFinding,
-            FoundPackOrBigDensity,
-            FoundPylon,
-            BossSpawned,
-            FoundClicableObjectOrNextFloor,
-            FoundLoot,
-            GrOrRiftCompleted, // Make sure that after gr all gems was up if not tp back and up them. Plugin can fail and miss one upgrade
-        }
-
-        private enum VendorType
-        {
-            Kadala,
-            Blacksmith,
-            Orek
+            Idle,
         }
 
         public Helper()
@@ -124,42 +99,15 @@
 
             zoom = new Zoom("Diablo III64", 0x5AACF8);
 
-            watermarkEnabled = Hud.Render.CreateFont(
-                "tahoma",
-                8,
-                255,
-                0,
-                170,
-                0,
-                true,
-                false,
-                false
-            );
-            watermarkDisabled = Hud.Render.CreateFont(
-                "tahoma",
-                8,
-                255,
-                170,
-                0,
-                0,
-                true,
-                false,
-                false
-            );
-            debugFont = Hud.Render.CreateFont(
-                "tahoma",
-                16,
-                255,
-                0,
-                170,
-                0,
-                true,
-                false,
-                false
-            );
+            watermarkEnabled = Hud.Render.CreateFont("tahoma", 8, 255, 0, 170, 0, true, false, false);
+            watermarkDisabled = Hud.Render.CreateFont("tahoma", 8, 255, 170, 0, 0, true, false, false);
+            debugFont = Hud.Render.CreateFont("tahoma", 16, 255, 0, 170, 0, true, false, false);
+
             pixelHelper.SetLegendaries(Utils.GetAllSalvageableLegendaryAndSetItems(hud));
             pixelHelper.SetHelper(this);
+
             ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.F5, false, false, false);
+
             autoGamble = new AutoGamble(hud);
             alwaysUseYourParagon = new AlwaysUseYourParagon(hud);
             autoSalvagePlugin = new AutoSalvage(hud);
@@ -168,28 +116,15 @@
             openChestPlugin = new OpenChestPlugin(hud);
             autoOpenRift = new AutoOpenRift(hud);
             autoStashItems = new AutoStashItems(hud);
-            uiJoinPatryAcceptButton = Hud.Render.RegisterUiElement(
-                "Root.NormalLayer.rift_join_party_main.LayoutRoot.Background.buttons.accept",
-                null,
-                null
-            );
-            uiGRmainPage = Hud.Render.RegisterUiElement("Root.NormalLayer.rift_dialog_mainPage", null, null);
-
-            //var items = PixelHelperSettings.Instance.GetItemsToSave();
-            //foreach ( var item in items )
-            //{
-            //    Hud.Debug(item.ItemName);
-            //    Hud.Debug(item.IsAncient? "True" : "False");
-            //    Hud.Debug(item.MinAffix);
-            //}
         }
 
         public void PaintTopInGame(ClipState clipState)
         {
             if (clipState != ClipState.BeforeClip)
                 return;
-            //debugFont.DrawText($"state: {townState}. NewGame: {ForceDisconnect.Globals.create_new_game}", 4, Hud.Window.Size.Height * 0.966f);
-            debugFont.DrawText(debugText, 4, Hud.Window.Size.Height * 0.966f);
+
+            debugFont.DrawText(debugText, 4, Hud.Window.Size.Height * 0.166f);
+
             if (isHelperOn)
                 watermarkEnabled.DrawText("Pixel Helper: On. F5 To Turn Off! ", 4, Hud.Window.Size.Height * 0.966f);
             else
@@ -199,368 +134,282 @@
         public void OnNewArea(bool newGame, ISnoArea area)
         {
             LastSnoArea = area;
-            if (newGame)
-            {
-                if (area.IsTown && Hud.Game.CurrentAct != 1)
-                {
-                    townState = TownState.JustEntered;
-                }
-                else
-                {
-                    townState = TownState.Gambling;
-                }
-                helperState = HelperState.InTown;
-            }
+
             if (area.IsTown)
             {
                 helperState = HelperState.InTown;
-                townState = TownState.JustEntered;
+                townState = TownState.Idle;
+                townInitialized = false;
             }
             else
             {
                 helperState = HelperState.GrOrRift;
             }
+
             alwaysUseYourParagon.OnNewArea(newGame, area);
             pickUpPlugin.OnNewArea(newGame, area);
         }
 
         public void AfterCollect()
         {
-            //var obelisk = Hud.Game.Actors.Where(a => a.SnoActor.Sno == ActorSnoEnum._x1_openworld_lootrunobelisk_b).FirstOrDefault();
-            //debugText = $"IsClickable: {obelisk.IsClickable}";
-            //var freeSpace = Hud.Game.Me.InventorySpaceTotal - Hud.Game.InventorySpaceUsed;
-            //if (freeSpace != 60)
-            //{
-            //    autoStashItems.StashItems();
-            //}
-            //debugText = $"Free Space: {freeSpace}. Stash: {autoStashItems.debug}";
-            debugText = $"State: {townState}";
+            //debugText = $"State: {townState}";
+
             if (!isHelperOn || !IsActive())
                 return;
+
             switch (helperState)
             {
                 case HelperState.InTown:
                     ProcessTownState();
                     break;
+
                 case HelperState.GrOrRift:
                     ProcessOutsideTownState();
-                    // TODO: Implement general rift logic
                     break;
             }
         }
 
         private void ProcessTownState()
         {
+            if (ExecuteState())
+                return;
+
+            townState = SelectNextState();
+        }
+
+        private bool ExecuteState()
+        {
             switch (townState)
             {
-                case TownState.JustEntered:
-                    HandleJustEntered();
-                    break;
                 case TownState.Gambling:
-                    if (DoGambling())
-                    {
-                        townState = TownState.Salvaging;
-                    }
-                    break;
+                    return DoGambling();
                 case TownState.Salvaging:
-                    if (DoSalvaging())
-                    {
-                        if (Hud.Game.Me.Materials.BloodShard > minimumShardsToGamble)
-                        {
-                            townState = TownState.Gambling;
-                        }
-                        else
-                        {
-                            townState = TownState.AssigningParagons;
-                        }
-                    }
-                    break;
-                case TownState.NoFreeSpace:
-                    //if (StashItems())
-                    //{
-                    //    townState = TownState.AssigningParagons;
-                    //}
-                    //else
-                    //{
-                    //    townState = TownState.NoFreeSpace;
-                    //}
-                    townState = TownState.NoFreeSpace;
-                    break;
-                case TownState.AssigningParagons:
-                    if (DoAssigningParagons())
-                    {
-                        townState = TownState.ClosingRift;
-                    }
-                    break;
+                    return DoSalvaging();
                 case TownState.ClosingRift:
-                    if (DoCloseRift())
-                    {
-                        townState = TownState.AutoOpeningRift;
-                    }
-                    break;
+                    return DoCloseRift();
+                case TownState.AssigningParagons:
+                    return DoAssigningParagons();
                 case TownState.AutoOpeningRift:
-                    if (DoAutoOpeningRift())
-                    {
-                        townState = TownState.Idle;
-                    }
-                    break;
+                    return DoAutoOpeningRift();
+                case TownState.Teleporting:
+                    return Hud.Game.CurrentAct != 1;
                 case TownState.Idle:
-                    DoIdleStuff();
-                    break;
+                    return false;
             }
+            return false;
+        }
+
+        private TownState SelectNextState()
+        {
+            // --- Act logic ---
+            if (PixelHelperSettings.Instance.AlwaysActOne)
+            {
+                if (Hud.Game.CurrentAct != 1)
+                    return TownState.Teleporting;
+            }
+            else if (Hud.Game.CurrentAct != 1)
+                return TownState.Idle;
+
+            // --- ONE-TIME TOWN LOGIC ---
+            if (!townInitialized)
+            {
+                if (NeedsSalvage())
+                    return TownState.Salvaging;
+
+                if (CanGamble())
+                    return TownState.Gambling;
+
+                townInitialized = true;
+            }
+
+            // --- REACTIVE LOGIC ---
+            if (CanClosePortal())
+            {;
+                return TownState.ClosingRift;
+            }
+
+            if (NeedsParagons())
+            {
+                return TownState.AssigningParagons;
+            }
+
+            if (CanOpenRift())
+            {
+                return TownState.AutoOpeningRift;
+            }
+
+            return TownState.Idle;
         }
 
         private void ProcessOutsideTownState()
         {
             if (PixelHelperSettings.Instance.AutoPickUp)
-            {
                 pickUpPlugin.tryToPickUp();
-            }
-            if (PixelHelperSettings.Instance.AutoGemUp)
-            {
-                autoUpgrade.TryToUpgrade();
-            }
-            if (PixelHelperSettings.Instance.AutoPylons)
-            {
-                openChestPlugin.TryToOpenStuff();
-            }
-        }
 
-        private void HandleJustEntered()
-        {
-            if (PixelHelperSettings.Instance.AlwaysActOne)
-            {
-                if (Hud.Game.CurrentAct != 1)
-                {
-                    // Always Act One Should TP Just Waiting
-                    return;
-                }
-            }
-            townState = TownState.Gambling;
+            if (PixelHelperSettings.Instance.AutoGemUp)
+                autoUpgrade.TryToUpgrade();
+
+            if (PixelHelperSettings.Instance.AutoPylons)
+                openChestPlugin.TryToOpenStuff();
         }
 
         private bool DoGambling()
         {
-            if (!PixelHelperSettings.Instance.AutoGamble)
-            {
-                return true;
-            }
-
-            var shards = Hud.Game.Me.Materials.BloodShard;
-            if (shards < minimumShardsToGamble || !IsEnoughSpaceFor1x2Item())
-            {
-                return true;
-            }
-
             var kadala = Hud.Game.Actors.FirstOrDefault(x =>
-                x.SnoActor.Sno == ActorSnoEnum._x1_randomitemnpc
-            );
+                x.SnoActor.Sno == ActorSnoEnum._x1_randomitemnpc);
+
             if (kadala == null)
-            {
                 return false;
-            }
 
             if (!autoGamble.IsGambleTabIsActive())
             {
                 TryToReachNPC(kadala);
                 return false;
             }
-            else
+
+            autoGamble.TryToGamble();
+            return CanGamble();
+        }
+
+        private bool CanGamble()
+        {
+            return PixelHelperSettings.Instance.AutoGamble &&
+                   Hud.Game.Me.Materials.BloodShard >= minimumShardsToGamble &&
+                   IsEnoughSpaceFor1x2Item();
+        }
+
+        private bool NeedsSalvage()
+        {
+            return PixelHelperSettings.Instance.AutoSalvage &&
+                   autoSalvagePlugin.GetItemsToSalvage().Any() &&
+                   (!IsEnoughSpaceFor1x2Item() ||
+                    Hud.Game.Me.Materials.BloodShard < minimumShardsToGamble);
+        }
+
+        private bool NeedsParagons()
+        {
+            return PixelHelperSettings.Instance.AlwaysUsePara &&
+                   Hud.Game.Me.ParagonPointsAvailable[0] > 0;
+        }
+
+        private bool CanOpenRift()
+        {
+            autoOpenRift.TryToAcceptGr();
+            var orek = Hud.Game.Actors.FirstOrDefault(x => x.SnoActor.Sno == ActorSnoEnum._x1_lr_nephalem);
+            if (orek == null || !PixelHelperSettings.Instance.AutoOpenRift)
             {
-                autoGamble.TryToGamble();
-                return !IsEnoughSpaceFor1x2Item() || shards < minimumShardsToGamble;
+                return false;
             }
+            var quest = glq.PublicClassPlugin.riftQuest(Hud);
+            if (quest == null)
+            {
+                return true;
+            }
+            bool iconDone = orek.GetAttributeValueAsInt(Hud.Sno.Attributes.Conversation_Icon, 0, -1) == 3;
+            bool noRift = !glq.PublicClassPlugin.IsGreaterRift(Hud)
+                       && !glq.PublicClassPlugin.IsNephalemRift(Hud);
+
+            return iconDone && noRift;
         }
 
         private bool DoSalvaging()
         {
-            if (!PixelHelperSettings.Instance.AutoSalvage)
-            { 
-                return true; 
-            }
-            if (!autoSalvagePlugin.GetItemsToSalvage().Any())
-            {
-                return true;
-            }
-            var blacksmith = Hud.Game.Actors.FirstOrDefault(x =>
-                x.SnoActor.Sno == ActorSnoEnum._pt_blacksmith_repairshortcut
-            );
-            if (blacksmith == null)
-            {
+            var items = autoSalvagePlugin.GetItemsToSalvage();
+
+            if (!items.Any())
                 return false;
-            }
+
+            var blacksmith = Hud.Game.Actors.FirstOrDefault(x =>
+                x.SnoActor.Sno == ActorSnoEnum._pt_blacksmith_repairshortcut);
+
+            if (blacksmith == null)
+                return true;
+
             if (!autoSalvagePlugin.IsSalvageTabIsActive())
             {
                 TryToReachNPC(blacksmith);
-                return false;
-            }
-            else
-            {
-                autoSalvagePlugin.TryToSalvage(LastSnoArea);
-                return !autoSalvagePlugin.GetItemsToSalvage().Any();
-            }
-        }
-
-        private bool StashItems()
-        {
-            var freeSpace = Hud.Game.Me.InventorySpaceTotal - Hud.Game.InventorySpaceUsed;
-            if (isBotting && freeSpace < 40)
-            {
-                return autoStashItems.StashItems();
-            }
-            else if (freeSpace < 20)
-            {
-                return autoStashItems.StashItems();
-            }
-            else
-            {
                 return true;
             }
+
+            autoSalvagePlugin.TryToSalvage(LastSnoArea);
+
+            return true;
         }
 
         private bool DoAssigningParagons()
         {
-            if (PixelHelperSettings.Instance.AlwaysUsePara)
+            if (!PixelHelperSettings.Instance.AlwaysUsePara)
             {
-
-                alwaysUseYourParagon.TryToUseParagons();
-                if (Hud.Game.Me.ParagonPointsAvailable[0] == 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
-            return true;
+
+            alwaysUseYourParagon.TryToUseParagons();
+            return Hud.Game.Me.ParagonPointsAvailable[0] != 0;
         }
 
         private bool DoAutoOpeningRift()
         {
-            if (PixelHelperSettings.Instance.AutoOpenRift)
-            {
-                var obelisk = Hud.Game.Actors.Where(a => a.SnoActor.Sno == ActorSnoEnum._x1_openworld_lootrunobelisk_b).FirstOrDefault();
-                if (obelisk == null)
-                {
-                    return false;
-                }
-                if (glq.PublicClassPlugin.riftQuest(Hud) == null)
-                {
-                    TryToReachNPC(obelisk);
-                    autoOpenRift.TryToOpenRift();
-                }
-                return glq.PublicClassPlugin.riftQuest(Hud) != null;
-            }
-            else
-            {
-                townState = TownState.Idle;
-            }
+            var obelisk = Hud.Game.Actors.Where(a => a.SnoActor.Sno == ActorSnoEnum._x1_openworld_lootrunobelisk_b).FirstOrDefault();
+
+            if (obelisk == null)
+                return false;
+
+            TryToReachNPC(obelisk);
+            autoOpenRift.TryToOpenRift();
             return true;
         }
 
         private bool IsEnoughSpaceFor1x2Item()
         {
             Array.Clear(_usedSpaces, 0, _usedSpaces.Length);
+
             foreach (var item in Hud.Inventory.ItemsInInventory)
             {
                 for (var x = 0; x < item.SnoItem.ItemWidth; x++)
-                {
                     for (var y = 0; y < item.SnoItem.ItemHeight; y++)
                     {
                         var xpos = item.InventoryX + x;
                         var ypos = item.InventoryY + y;
+
                         if (xpos >= 0 && xpos < 10 && ypos >= 0 && ypos < 6)
                             _usedSpaces[xpos, ypos] = true;
                     }
-                }
             }
 
             for (var x = 0; x < 10; x++)
-            {
                 for (var y = 0; y < 5; y++)
-                {
                     if (!_usedSpaces[x, y] && !_usedSpaces[x, y + 1])
                         return true;
-                }
-            }
-            return false;
-        }
 
-        private void DoIdleStuff()
-        {
-            if (PixelHelperSettings.Instance.AlwaysUsePara)
-            {
-                if (Hud.Game.Me.ParagonPointsAvailable[0] != 0)
-                {
-                    townState = TownState.AssigningParagons;
-                }
-            }
-            var OpenPortal = Hud.Game.Actors.Where(x => x.SnoActor.Sno == ActorSnoEnum._x1_openworld_tiered_rifts_portal).FirstOrDefault();
-            if (OpenPortal != null)
-            {
-                if (CanClosePortal())
-                {
-                    townState = TownState.ClosingRift;
-                }
-            }
-            if (PixelHelperSettings.Instance.AutoAcceptGR)
-            {
-                if (LayerVisible("Root.NormalLayer.rift_join_party_main.LayoutRoot"))
-                {
-                    Hud.Interaction.ClickUiElement(MouseButtons.Left, uiJoinPatryAcceptButton);
-                }
-            }
+            return false;
         }
 
         private bool DoCloseRift()
         {
             var orek = Hud.Game.Actors.FirstOrDefault(x =>
-                x.SnoActor.Sno == ActorSnoEnum._x1_lr_nephalem
-            );
+                x.SnoActor.Sno == ActorSnoEnum._x1_lr_nephalem);
+
             if (orek == null)
-            {
                 return false;
-            }
-            if (CanClosePortal())
+
+            if (orek.GetAttributeValueAsInt(Hud.Sno.Attributes.Conversation_Icon, 0, -1) == 1)
             {
                 TryToReachNPC(orek);
-                return false;
+                return true;
             }
-            return true;
+            return false;
+
         }
 
         private bool CanClosePortal()
         {
-            bool isGR = glq.PublicClassPlugin.IsGreaterRift(Hud);
-            bool isNR = glq.PublicClassPlugin.IsNephalemRift(Hud);
-            bool isBossIsDead = glq.PublicClassPlugin.IsGuardianDead(Hud);
 
-            bool isAllGemsWasUp = true;
-            foreach (var player in Hud.Game.Players)
-            {
-                var reminder = player.GetAttributeValueAsInt(Hud.Sno.Attributes.Jewel_Upgrades_Bonus, 2147483647, 0) +
-                              player.GetAttributeValueAsInt(Hud.Sno.Attributes.Jewel_Upgrades_Max, 2147483647, 0) -
-                              player.GetAttributeValueAsInt(Hud.Sno.Attributes.Jewel_Upgrades_Used, 2147483647, 0);
-                if (reminder != 0)
-                {
-                    isAllGemsWasUp = false;
-                    break;
-                }
-            }
+            var orek = Hud.Game.Actors.FirstOrDefault(x => x.SnoActor.Sno == ActorSnoEnum._x1_lr_nephalem);
 
-            var orek = Hud.Game.Actors.FirstOrDefault(x =>
-                x.SnoActor.Sno == ActorSnoEnum._x1_lr_nephalem
-            );
             if (orek == null)
-            {
                 return false;
-            }
-            if ((isGR || isNR) && isBossIsDead && isAllGemsWasUp)
-            {
-                return true;
-            }
-            return false;
+
+            return orek.GetAttributeValueAsInt(Hud.Sno.Attributes.Conversation_Icon, 0, -1) == 1;
         }
 
         private bool LayerVisible(string path)
@@ -571,33 +420,31 @@
 
         private void TryToReachNPC(IActor actor)
         {
-            if (actor.NormalizedXyDistanceToMe > 5)
+            if (actor == null)
+                return;
+
+            if (actor.NormalizedXyDistanceToMe < 5)
             {
-                Hud.Interaction.MouseMove(
-                    (int)actor.ScreenCoordinate.X,
-                    (int)actor.ScreenCoordinate.Y
-                );
-                Thread.Sleep(60);
-                Hud.Interaction.MouseDown(MouseButtons.Left);
-                Thread.Sleep(60);
-                Hud.Interaction.MouseUp(MouseButtons.Left);
+                Hud.Interaction.TalkTownActor(actor);
             }
             else
             {
-                Hud.Interaction.TalkTownActor(actor);
+                Hud.Interaction.MouseMove((int)actor.ScreenCoordinate.X, (int)actor.ScreenCoordinate.Y);
+                Hud.Interaction.DoActionAutoShift(ActionKey.Move);
+                Thread.Sleep(60);
             }
         }
 
         private bool IsActive()
         {
             bool active =
-                Hud.Game.IsInGame
-                && !Hud.Game.IsLoading
-                && !Hud.Game.Me.IsDead
-                && !Hud.Render.UiHidden
-                && Hud.Window.IsForeground
-                && Hud.Game.MapMode == MapMode.Minimap
-                && Hud.Game.Me.AnimationState != AcdAnimationState.Dead;
+                Hud.Game.IsInGame &&
+                !Hud.Game.IsLoading &&
+                !Hud.Game.Me.IsDead &&
+                !Hud.Render.UiHidden &&
+                Hud.Window.IsForeground &&
+                Hud.Game.MapMode == MapMode.Minimap &&
+                Hud.Game.Me.AnimationState != AcdAnimationState.Dead;
 
             string[] blockedPaths =
             {

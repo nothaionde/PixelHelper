@@ -1,4 +1,4 @@
-ï»¿using System.Linq;
+using System.Linq;
 using Turbo.Plugins.glq;
 namespace Turbo.Plugins.LightningMod
 {
@@ -20,20 +20,20 @@ namespace Turbo.Plugins.LightningMod
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfCanCastSimple().ThenContinueElseNoCast()
-                .IfSpecificBuffIsAboutToExpire(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting, 0, 500, 2000, true).ThenCastElseContinue()//å‡è€—å¡”ç»“æŸå‰æ–½æ”¾ä¸€æ¬¡
+                .IfSpecificBuffIsAboutToExpire(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting, 0, 500, 2000, true).ThenCastElseContinue()//¼õºÄËş½áÊøÇ°Ê©·ÅÒ»´Î
                 .IfBuffIsAboutToExpire(300, 500).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
                 {
                     int CoeIndex = Hud.GetPlugin<PublicClassPlugin>().CoeIndex;
                     bool isCOE = ctx.Skill.Player.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.ConventionOfElements.Sno);
                     double HighestElementLeft = PublicClassPlugin.GetHighestElementLeftSecond(hud, ctx.Skill.Player, CoeIndex);
-                    var IKset = Hud.Game.Me.GetSetItemCount(671068) >= 4;//ä¸æœ½4ä»¶å¥—
-                    return (IKset) || (Hud.Game.Me.Powers.UsedPassives.Any(p => p.Sno == Hud.Sno.SnoPowers.Barbarian_Passive_BoonOfBulKathos.Sno) && ctx.Skill.Player.Stats.CooldownReduction >= 0.75) //å¸ƒå°”å‡¯ç´¢çš„æ©æ³½è¢«åŠ¨ ä¸” CDRé«˜äº75
-                    || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.ObsidianRingOfTheZodiac.Sno) //é»„é“
+                    var IKset = Hud.Game.Me.GetSetItemCount(671068) >= 4;//²»Ğà4¼şÌ×
+                    return (IKset) || (Hud.Game.Me.Powers.UsedPassives.Any(p => p.Sno == Hud.Sno.SnoPowers.Barbarian_Passive_BoonOfBulKathos.Sno) && ctx.Skill.Player.Stats.CooldownReduction >= 0.75) //²¼¶û¿­Ë÷µÄ¶÷Ôó±»¶¯ ÇÒ CDR¸ßÓÚ75
+                    || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.ObsidianRingOfTheZodiac.Sno) //»ÆµÀ
                     
-                    || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.MesserschmidtsReaver.Sno) //æ¢…æ–§
-                    ||(isCOE ? ((HighestElementLeft <= 16 && HighestElementLeft >= 15) || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Ingeom.Sno)) && Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false) : Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false)) //é­é‡ç²¾è‹±æˆ–BOSSï¼Œè£…å¤‡å…ƒç´ æˆ’æŒ‡æ—¶åªåœ¨çˆ†å‘å‰1ç§’æ–½æ”¾
-                    || (ctx.Skill.Player.Defense.HealthPct <= 30)//è¡€é‡ä½äº30%
+                    || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.MesserschmidtsReaver.Sno) //Ã·¸«
+                    ||(isCOE ? ((HighestElementLeft <= 16 && HighestElementLeft >= 15) || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Ingeom.Sno)) && Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false) : Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false)) //ÔâÓö¾«Ó¢»òBOSS£¬×°±¸ÔªËØ½äÖ¸Ê±Ö»ÔÚ±¬·¢Ç°1ÃëÊ©·Å
+                    || (ctx.Skill.Player.Defense.HealthPct <= 30)//ÑªÁ¿µÍÓÚ30%
                         ;
                 }).ThenCastElseContinue()
                 .IfTrue(ctx =>
@@ -42,7 +42,7 @@ namespace Turbo.Plugins.LightningMod
                     bool isCOE = ctx.Skill.Player.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.ConventionOfElements.Sno);
                     bool NinetySet = Hud.Game.Me.GetSetItemCount(397674) >= 6;
                     bool RaekorSet = Hud.Game.Me.GetSetItemCount(749637) >= 6;
-                    return (NinetySet || RaekorSet) && isCOE && Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false) && PublicClassPlugin.IsElementReady(ctx.Hud, 0.1, ctx.Skill.Player, CoeIndex) //é­é‡ç²¾è‹±æˆ–BOSSï¼Œè£…å¤‡å…ƒç´ æˆ’æŒ‡æ—¶åªåœ¨çˆ†å‘å‰0.1ç§’æ–½æ”¾
+                    return (NinetySet || RaekorSet) && isCOE && Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false) && PublicClassPlugin.IsElementReady(ctx.Hud, 0.1, ctx.Skill.Player, CoeIndex) //ÔâÓö¾«Ó¢»òBOSS£¬×°±¸ÔªËØ½äÖ¸Ê±Ö»ÔÚ±¬·¢Ç°0.1ÃëÊ©·Å
                         ;
                 }).ThenCastElseContinue()
                 ;

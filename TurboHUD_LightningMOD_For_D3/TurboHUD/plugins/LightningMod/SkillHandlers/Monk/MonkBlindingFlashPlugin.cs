@@ -1,4 +1,4 @@
-ï»¿using Turbo.Plugins.glq;
+using Turbo.Plugins.glq;
 
 namespace Turbo.Plugins.LightningMod
 {
@@ -28,7 +28,7 @@ namespace Turbo.Plugins.LightningMod
                 .IfEnoughMonstersNearby(ctx => 20, ctx => 5).ThenCastElseContinue()
                 ;
 
-            CreateCastRule()//ç‘Ÿå¤«ä¹‹æ³•å›å†…åŠ›
+            CreateCastRule()//Éª·òÖ®·¨»ØÄÚÁ¦
                 .IfCanCastSkill(150, 200, 1000).ThenContinueElseNoCast()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
@@ -40,7 +40,7 @@ namespace Turbo.Plugins.LightningMod
                 .IfPrimaryResourcePercentageIsBelow(20).ThenCastElseContinue()
                 ;
 
-            CreateCastRule()//æ­£ä¹‰å†°å¥”
+            CreateCastRule()//ÕıÒå±ù±¼
                 .IfCanCastSkill(150, 200, 1000).ThenContinueElseNoCast()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
@@ -48,10 +48,10 @@ namespace Turbo.Plugins.LightningMod
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfRunning().ThenNoCastElseContinue()
                 .IfIdle().ThenNoCastElseContinue()
-                .IfTrue(ctx => ctx.Skill.Player.GetSetItemCount(1044700) >= 6).ThenContinueElseNoCast()//æ­£ä¹‰6ä»¶
-                .IfSpecificBuffIsActive(Hud.Sno.SnoPowers.ConventionOfElements).ThenContinueElseNoCast()//å…ƒç´ æˆ’æŒ‡
-                .IfTrue(ctx => PublicClassPlugin.IsElementReady(ctx.Hud, 0.1, ctx.Skill.Player, 2)).ThenCastElseContinue()//å†°å…ƒç´ çˆ†å‘
-                ;
+                .IfTrue(ctx => ctx.Skill.Player.GetSetItemCount(1044700) >= 6).ThenContinueElseNoCast()//ÕıÒå6¼ş
+                .IfSpecificBuffIsActive(Hud.Sno.SnoPowers.ConventionOfElements).ThenContinueElseNoCast()//ÔªËØ½äÖ¸
+                .IfTrue(ctx => PublicClassPlugin.IsElementReady(ctx.Hud, 0.1, ctx.Skill.Player, 2)).ThenCastElseContinue()//±ùÔªËØ±¬·¢
+                ;		 
         }
     }
 }

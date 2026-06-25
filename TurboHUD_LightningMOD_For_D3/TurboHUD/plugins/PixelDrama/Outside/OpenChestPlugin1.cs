@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Windows.Forms;
     using Turbo.Plugins.Default;
+    using System;
 
     public class OpenChestPlugin
     {
@@ -28,8 +29,10 @@
         public bool Speed { get; set; } = true;
         public bool Conduit { get; set; } = true;
         public bool Shield { get; set; } = true;
-        public bool Channeling { get; set; } = true;
-        public int ClickPylonInGRRank { get; set; } = 140;
+        public bool Channeling { get; set; } = true; 
+        private bool _bossSpawned = false;
+        public int ClickPylonInGRRank { get; set; } = 140; 
+        private IWatch _portalTimer;
         private readonly HashSet<uint> _clickedAnnIds = new HashSet<uint>();
         private IController Hud;
         public readonly HashSet<ActorSnoEnum> SwitchIds = new HashSet<ActorSnoEnum>
@@ -50,24 +53,13 @@
 			ActorSnoEnum._a3dun_keep_bridge, // A3 rakkis crossing
             ActorSnoEnum._a3dun_rmpt_frozendoor_a, // A3 stonefort
             ActorSnoEnum._catapult_a3dunkeep_warmachines_snow_firing, // A3 battlefields
-            ActorSnoEnum._x1_crusader_trebuchet_pending_tar,
-            ActorSnoEnum._event_1000monster_portal,
-            ActorSnoEnum._a2dun_zolt_sandbridgebase_bossfight,
-            ActorSnoEnum._px_highlands_camp_resurgentcult_portal,
-            ActorSnoEnum._x1_bog_catacombsportal_beaconloc,
             ActorSnoEnum._x1_malthael_boss_orb_collapse, // malthael fight
             ActorSnoEnum._caout_oasis_mine_entrance_a, // check this one, maybe a bounty
             ActorSnoEnum._trout_leor_painting, // leoric manor
             ActorSnoEnum._a4dun_sigil_room_platform_a, // Holy Sanctum
             ActorSnoEnum._a3dun_rmpt_catapult_follower_event_gate, // a3 catapult event
-            ActorSnoEnum._a1dun_leor_jail_door_superlocked_a_fake,
-            ActorSnoEnum._cos_pet_mimic_01,
             ActorSnoEnum._shoulderpads_norm_base_flippy, // ???
-            ActorSnoEnum._x1_abattoir_barricade_solid,
-            ActorSnoEnum._x1_fortress_floatrubble_a,
             ActorSnoEnum._a3dun_keep_barrel_snow_no_skirt, // Sturdy Barrel
-            ActorSnoEnum._x1_fortress_crystal_prison_shield,
-            ActorSnoEnum._x1_westm_railing_a_01_piece1,
             ActorSnoEnum._x1_pand_hexmaze_corpse, // Corpse
             ActorSnoEnum._dh_companion_runec,
             ActorSnoEnum._loottype2_tristramvillager_male_c_corpse_01, // Dead Villager
@@ -132,6 +124,7 @@
             Channeling = PixelHelperSettings.Instance.Channeling;
             uiInv = Hud.Inventory.InventoryMainUiElement;
             _timer = Hud.Time.CreateAndStartWatch();
+            _portalTimer = Hud.Time.CreateAndStartWatch();
         }
 
 
@@ -178,6 +171,26 @@
                 return;
             }
 
+
+            var portal = Hud.Game.Portals.FirstOrDefault(p =>
+                            p.TargetArea != null
+                            && !p.TargetArea.IsTown
+                            && p.IsOnScreen
+                            && Hud.Game.Me.FloorCoordinate.XYDistanceTo(p.FloorCoordinate) <= 10);
+
+            if (portal != null && _portalTimer.ElapsedMilliseconds > 10000)
+            {
+                float x = portal.ScreenCoordinate.X;
+                float y = portal.ScreenCoordinate.Y;
+
+                x = (float)Math.Max(3, Math.Min(Hud.Window.Size.Width - 3, x));
+                y = (float)Math.Max(3, Math.Min(Hud.Window.Size.Height - 3, y));
+
+                Hud.Interaction.MouseMove(x, y);
+                Hud.Interaction.DoAction(ActionKey.LeftSkill);
+                _portalTimer.Restart();
+            }
+
             var Actors = Hud.Game.Actors.Where(x =>
             {
                 if (WhenForceMoveInvalid && Hud.Interaction.IsHotKeySet(ActionKey.Move) && Hud.Interaction.IsContinuousActionStarted(ActionKey.Move))
@@ -196,20 +209,6 @@
 
                 if (!x.IsDisabled && !x.IsOperated)
                 {
-                    // Проверка сундуков и других объектов
-                    if (x.GizmoType == GizmoType.Chest)
-                    {
-                        return (Rack && (x.SnoActor.Kind == ActorKind.ArmorRack || x.SnoActor.Kind == ActorKind.WeaponRack)) ||
-                               (DeadBody && x.SnoActor.Kind == ActorKind.DeadBody) ||
-                               (Chest && x.SnoActor.Kind == ActorKind.Chest) ||
-                               (ChestNormal && x.SnoActor.Kind == ActorKind.ChestNormal) ||
-                               (Stone && x.SnoActor.Kind == ActorKind.None &&
-                                x.SnoActor.NameEnglish != "Chandelier Chain" &&
-                                x.SnoActor.Kind != ActorKind.CursedEvent &&
-                                x.SnoActor.Kind != ActorKind.QuestActivate);
-                    }
-
-                    // Новая логика для пилонов и святилищ
                     if (Shrine && x.SnoActor.Kind == ActorKind.Shrine &&
                         x.GizmoType != GizmoType.HealingWell &&
                         x.GizmoType != GizmoType.PoolOfReflection)
@@ -240,17 +239,11 @@
 
                         return IsValidPylonType(x);
                     }
-
-                    // Опытные источники
-                    if (Pool && x.GizmoType == GizmoType.PoolOfReflection)
-                    {
-                        return Hud.Game.NumberOfPlayersInGame == 1; // Только в соло
-                    }
-
                     // Двери
                     if (door && (x.GizmoType == GizmoType.Door || SwitchIds.Contains(x.SnoActor.Sno)))
                     {
                         return !DoorsIdsBlackList.Contains(x.SnoActor.Sno);
+                        ;
                     }
                 }
 

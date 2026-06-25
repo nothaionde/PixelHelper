@@ -36,7 +36,7 @@
         public override void Load(IController hud)
         {
             base.Load(hud);
-            ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.F4, false, false, false);
+            ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.R, false, false, false);
             HeaderFont = Hud.Render.CreateFont("tahoma", 10, 255, 200, 200, 100, true, false, 255, 0, 0, 0, true);
             InfoFont = Hud.Render.CreateFont("tahoma", 8, 255, 200, 200, 0, true, false, 255, 0, 0, 0, true);
             gemUpgradePane = Hud.Render.RegisterUiElement("Root.NormalLayer.vendor_dialog_mainPage.riftReward_dialog.LayoutRoot.gemUpgradePane", null, null);

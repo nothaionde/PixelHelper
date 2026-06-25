@@ -12,6 +12,7 @@
         protected IUiElement uiOnGreaterRift;
         protected IUiElement uiOnNormalRift;
         protected IUiElement uiAcceptButton;
+        protected IUiElement uiJoinPatryAcceptButton;
         private bool needToMoveMouse = false;
         public string debug = "";
 
@@ -23,6 +24,11 @@
             uiOnGreaterRift = Hud.Render.RegisterUiElement("Root.NormalLayer.rift_dialog_mainPage.LayoutRoot.RiftRadioButtons.GreaterRiftButton", null, null);
             uiOnNormalRift = Hud.Render.RegisterUiElement("Root.NormalLayer.rift_dialog_mainPage.LayoutRoot.RiftRadioButtons.NephalemRiftButton", null, null);
             uiAcceptButton = Hud.Render.RegisterUiElement("Root.NormalLayer.rift_dialog_mainPage.LayoutRoot.accept_Button", null, null);
+            uiJoinPatryAcceptButton = Hud.Render.RegisterUiElement(
+                "Root.NormalLayer.rift_join_party_main.LayoutRoot.Background.buttons.accept",
+                null,
+                null
+            );
         }
 
         public void TryToOpenRift()
@@ -80,6 +86,19 @@
         }
         public void TryToAcceptGr()
         {
+            if (PixelHelperSettings.Instance.AutoAcceptGR)
+            {
+                if (LayerVisible("Root.NormalLayer.rift_join_party_main.LayoutRoot"))
+                {
+                    Hud.Interaction.ClickUiElement(MouseButtons.Left, uiJoinPatryAcceptButton);
+                }
+            }
+        }
+
+        private bool LayerVisible(string path)
+        {
+            var layer = Hud.Render.GetUiElement(path);
+            return layer != null && layer.Visible;
         }
     }
 }

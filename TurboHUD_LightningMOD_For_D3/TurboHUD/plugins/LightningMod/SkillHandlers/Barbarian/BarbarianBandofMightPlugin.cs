@@ -6,7 +6,7 @@
     public class BarbarianBandofMightPlugin : BasePlugin, IAfterCollectHandler
     {
         private IScreenCoordinate PlayerScreenCoordinate = null;
-        private IWorldCoordinate LastWorldCoordinate = null;
+        private IWorldCoordinate LastWorldCoordinate = null;												
         private IWatch Timer;
         public BarbarianBandofMightPlugin()
         {
@@ -69,7 +69,7 @@
                 else
                 {
                     Hud.Interaction.DoActionAutoShift(skill.Key);
-                }
+                }		 
                 Timer.Restart();
             }
         }

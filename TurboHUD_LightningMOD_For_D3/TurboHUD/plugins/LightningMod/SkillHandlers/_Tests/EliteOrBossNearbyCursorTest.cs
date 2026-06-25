@@ -14,7 +14,7 @@
 
             var range = RangeFunc(context);
             IWorldCoordinate cursor = context.Hud.Window.CreateScreenCoordinate(context.Hud.Window.CursorX, context.Hud.Window.CursorY).ToWorldCoordinate();
-            bool Result = context.Hud.Game.AliveMonsters.Any(m =>((m.IsElite && (IncludeMinion ? true : m.Rarity != ActorRarity.RareMinion)) || m.SnoMonster.Priority == MonsterPriority.goblin) && (m.FloorCoordinate.XYZDistanceTo(cursor) - m.RadiusBottom) <= range && !m.Invulnerable && !m.Invisible && !m.Illusion);
+           bool Result = context.Hud.Game.AliveMonsters.Any(m =>((m.IsElite && (IncludeMinion ? true : m.Rarity != ActorRarity.RareMinion)) || m.SnoMonster.Priority == MonsterPriority.goblin) && (m.FloorCoordinate.XYZDistanceTo(cursor) - m.RadiusBottom) <= range && !m.Invulnerable && !m.Invisible && !m.Illusion);
             return Result ? ResultOnSuccess : ResultOnFail;
         }
     }

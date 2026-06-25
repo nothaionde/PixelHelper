@@ -58,6 +58,7 @@
                 {
                     bool CDR = ctx.Hud.Game.Me.Stats.CooldownReduction > 80;
                     bool isSetPestilence = ctx.Hud.Game.Me.GetSetItemCount(740282) >= 6;//死役6件套
+																											
                     return CDR && isSetPestilence && ctx.Hud.Game.Me.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.Necromancer_Passive_BloodIsPower.Sno) && (ctx.Hud.Game.Me.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.ObsidianRingOfTheZodiac.Sno) || ctx.Hud.Game.Me.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.Ingeom.Sno));//死役+鲜血之力+黄道或寅剑
                 }).ThenContinueElseNoCast()
                 

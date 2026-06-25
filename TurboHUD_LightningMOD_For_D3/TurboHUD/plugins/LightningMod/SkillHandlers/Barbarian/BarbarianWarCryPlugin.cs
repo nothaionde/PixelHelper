@@ -18,6 +18,18 @@ namespace Turbo.Plugins.LightningMod
             base.Load(hud);
             AssignedSnoPower = Hud.Sno.SnoPowers.Barbarian_WarCry;
 
+            //CreateCastRule()
+            //    .IfInTown().ThenContinueElseNoCast()
+            //    .IfTrue(ctx =>
+            //    {
+            //        var Animation = Hud.Game.Me.AnimationState;
+            //        return 
+            //        Animation == 2;
+            //    }
+            //    ).ThenCastElseContinue()
+            //    ;
+                
+
             CreateCastRule()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()

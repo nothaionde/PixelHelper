@@ -149,3 +149,12 @@ I don’t provide support for basic questions (“How do I install TurboHUD?”)
 For plugin-related questions (mine or others) — feel free to ask.
 
 But please first check TurboHUD’s built-in interfaces: almost everything is explained there.
+
+Q: Are there any exceptions or issues?
+A: Yes 
+
+Everything works, but some old auto-skill plugins from Lightning Mod are included.
+
+These are not my code, so I cannot fix or change them (Lazy).
+
+They do not affect the functionality of Pixel Helper.

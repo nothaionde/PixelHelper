@@ -1,4 +1,4 @@
-ï»¿using System.Linq;
+using System.Linq;
 namespace Turbo.Plugins.LightningMod
 {
     public class MonkMysticAllyPlugin : AbstractSkillHandler, ISkillHandler
@@ -20,8 +20,8 @@ namespace Turbo.Plugins.LightningMod
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
-                .IfTrue(ctx => (ctx.Skill.Rune == 3 || (ctx.Skill.Rune == 1 && ctx.Skill.Player.GetSetItemCount(742942) >= 6)) && ctx.Skill.Player.Stats.ResourceCurPri < ctx.Skill.Player.Stats.ResourceMaxPri - 200).ThenCastElseContinue()//é£ç›¸å¹»èº«3æˆ–æ°´å¹»èº«æ—¶æ®·å¨œ6ä»¶å¥—ä¸”å†…åŠ›ä½äºæœ€å¤§èµ„æº-200
-                .IfTrue(ctx => ctx.Skill.Rune == 4 && ctx.Skill.Player.Defense.HealthPct < 30).ThenCastElseContinue()//åšæ¯…å¹»èº«4
+                .IfTrue(ctx => (ctx.Skill.Rune == 3 || (ctx.Skill.Rune == 1 && ctx.Skill.Player.GetSetItemCount(742942) >= 6)) && ctx.Skill.Player.Stats.ResourceCurPri < 50).ThenCastElseContinue()//·çÏà»ÃÉí3»òË®»ÃÉíÊ±ÒóÄÈ6¼şÌ×ÇÒÄÚÁ¦µÍÓÚ50
+                .IfTrue(ctx => ctx.Skill.Rune == 4 && ctx.Skill.Player.Defense.HealthPct < 30).ThenCastElseContinue()//¼áÒã»ÃÉí4
                 ;
             CreateCastRule()
                 .IfCanCastSkill(100, 200, 500).ThenContinueElseNoCast()
@@ -31,13 +31,13 @@ namespace Turbo.Plugins.LightningMod
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfRunning().ThenNoCastElseContinue()
                 .IfIdle().ThenNoCastElseContinue()
-                .IfTrue(ctx => {//æ°´ç›¸å¹»èº«1å’ŒåœŸç›¸å¹»èº«
+                .IfTrue(ctx => {//Ë®Ïà»ÃÉí1ºÍÍÁÏà»ÃÉí
                     bool isBossOrEliteNearby = ctx.Hud.Game.AliveMonsters.Any(x => (x.Rarity == ActorRarity.Boss || x.Rarity == ActorRarity.Champion || x.Rarity == ActorRarity.Rare || x.Rarity == ActorRarity.Unique) && x.NormalizedXyDistanceToMe < 20 && !x.Illusion && !x.Invulnerable && !x.Invisible);
-                    return (ctx.Skill.Rune == 1 || ctx.Skill.Rune == 2) && ctx.Skill.Player.GetSetItemCount(742942) >= 6 && ((ctx.Skill.Player.Density.GetDensity(20) > 1 || isBossOrEliteNearby) && (getCurrentMysticAlly() - getCurrentStone()) >= getMaxMysticAlly());//æ®·å¨œ6ä»¶æ—¶æ–½æ”¾
+                    return (ctx.Skill.Rune == 1 || ctx.Skill.Rune == 2) && ctx.Skill.Player.GetSetItemCount(742942) >= 6 && ((ctx.Skill.Player.Density.GetDensity(20) > 1 || isBossOrEliteNearby) && (getCurrentMysticAlly() - getCurrentStone()) >= getMaxMysticAlly());//ÒóÄÈ6¼şÊ±Ê©·Å
                 }).ThenCastElseContinue()
-                .IfTrue(ctx => {//ç«ç›¸å¹»èº«0
+                .IfTrue(ctx => {//»ğÏà»ÃÉí0
                     bool isCOE = ctx.Hud.Game.Me.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.ConventionOfElements.Sno);
-                    bool isLesserGods = ctx.Hud.Game.Me.Powers.BuffIsActive(485725); //è’™å°˜è€…ç»‘è…•
+                    bool isLesserGods = ctx.Hud.Game.Me.Powers.BuffIsActive(485725); //ÃÉ³¾Õß°óÍó
                     bool isBossOrEliteNearby = ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(20, false) || ctx.Hud.Game.ActorQuery.NearestGoblin?.NormalizedXyDistanceToMe < 20 || ctx.Hud.Game.ActorQuery.NearestKeywarden?.NormalizedXyDistanceToMe < 20;
                     bool isLesserGodsDebuff = ctx.Hud.Game.AliveMonsters.Any(x => (isBossOrEliteNearby ? (x.Rarity == ActorRarity.Boss || x.Rarity == ActorRarity.Champion || x.Rarity == ActorRarity.Rare || x.Rarity == ActorRarity.Unique) : true) && x.NormalizedXyDistanceToMe < 20 && !x.Illusion && !x.Invulnerable && !x.Invisible && x.GetAttributeValue(Hud.Sno.Attributes.Power_Buff_1_Visual_Effect_None, 485725) == 1);
                     return ctx.Skill.Rune == 0 && isLesserGods && isLesserGodsDebuff && (isCOE ? ctx.Skill.Player.Powers.BuffIsActive(ctx.Hud.Sno.SnoPowers.ConventionOfElements.Sno, 3) : true) && getCurrentMysticAlly() >= getMaxMysticAlly();
@@ -46,38 +46,38 @@ namespace Turbo.Plugins.LightningMod
         }
         private int getCurrentStone()
         {
-            return Hud.Game.Actors.Where(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_crimson || x.SnoActor.Sno == ActorSnoEnum._x1_projectile_mystically_runec_boulder //åœŸå¹»èº«çŸ³å¤´
+            return Hud.Game.Actors.Where(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_crimson || x.SnoActor.Sno == ActorSnoEnum._x1_projectile_mystically_runec_boulder //ÍÁ»ÃÉíÊ¯Í·
            )
             ).Count();
         }
         private int getCurrentMysticAlly()
         {
-            /*bool isanymysticallymini = Hud.Game.Actors.Any(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._x1_monk_female_mysticallymini_crimson) //ç«å¹»èº«å°äºº
+            /*bool isanymysticallymini = Hud.Game.Actors.Any(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._x1_monk_female_mysticallymini_crimson) //»ğ»ÃÉíĞ¡ÈË
            );
-            if (isanymysticallymini && Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting.Sno,0) == true)//å‡è€—å¡”ä¸”æœ‰å°å¹»èº«æ—¶
+            if (isanymysticallymini && Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting.Sno,0) == true)//¼õºÄËşÇÒÓĞĞ¡»ÃÉíÊ±
             {
                 return 0;
             }*/
 
-            int mysticallymini = Hud.Game.Actors.Count(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._x1_monk_female_mysticallymini_crimson) //ç«å¹»èº«å°äºº
+            int mysticallymini = Hud.Game.Actors.Count(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._x1_monk_female_mysticallymini_crimson) //»ğ»ÃÉíĞ¡ÈË
            );
-            int threshold = 5;//çˆ†ç‚¸å¤šå°‘ä¸ªå°ç«äººåå†æ¬¡è§¦å‘
-            if (mysticallymini > 0 && mysticallymini < ((getMaxMysticAlly() * 2 - threshold) < 1 ? 1: (getMaxMysticAlly() * 2 - threshold)) && Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting.Sno, 0) == true)//å‡è€—å¡”ä¸”æœ‰å°å¹»èº«æ—¶
+            int threshold = 5;//±¬Õ¨¶àÉÙ¸öĞ¡»ğÈËºóÔÙ´Î´¥·¢
+            if (mysticallymini > 0 && mysticallymini < ((getMaxMysticAlly() * 2 - threshold) < 1 ? 1: (getMaxMysticAlly() * 2 - threshold)) && Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting.Sno, 0) == true)//¼õºÄËşÇÒÓĞĞ¡»ÃÉíÊ±
             {
                 return (getMaxMysticAlly() * 2);
             }
             if (mysticallymini >= ((getMaxMysticAlly() * 2 - threshold) < 1 ? 1 : (getMaxMysticAlly() * 2 - threshold)) && Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.Generic_PagesBuffInfiniteCasting.Sno, 0) == true) return 0;
 
-            return  Hud.Game.Actors.Where(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_crimson || x.SnoActor.Sno == ActorSnoEnum._monk_male_mystically_crimson || //ç«å¹»èº«
-           x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_indigo || x.SnoActor.Sno == ActorSnoEnum._monk_male_mystically_indigo ||//æ°´å¹»èº«
-           x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_obsidian || x.SnoActor.Sno == ActorSnoEnum._monk_male_mystically_obsidian//åœŸå¹»èº«
+            return  Hud.Game.Actors.Where(x => x.SummonerAcdDynamicId == Hud.Game.Me.SummonerId && (x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_crimson || x.SnoActor.Sno == ActorSnoEnum._monk_male_mystically_crimson || //»ğ»ÃÉí
+           x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_indigo || x.SnoActor.Sno == ActorSnoEnum._monk_male_mystically_indigo ||//Ë®»ÃÉí
+           x.SnoActor.Sno == ActorSnoEnum._monk_female_mystically_obsidian || x.SnoActor.Sno == ActorSnoEnum._monk_male_mystically_obsidian//ÍÁ»ÃÉí
            )
            ).Count();
         }
         private int getMaxMysticAlly()
         {
             if (Hud.Game.Me.GetSetItemCount(742942) >= 6) return 10;
-            if (Hud.Game.Me.Powers.BuffIsActive(409811) || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.TheCrudestBoots.Sno)) return 2;//æ–°è€ç²—ç³™é‹
+            if (Hud.Game.Me.Powers.BuffIsActive(409811) || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.TheCrudestBoots.Sno)) return 2;//ĞÂÀÏ´Ö²ÚĞ¬
             return 1;
         }
     }

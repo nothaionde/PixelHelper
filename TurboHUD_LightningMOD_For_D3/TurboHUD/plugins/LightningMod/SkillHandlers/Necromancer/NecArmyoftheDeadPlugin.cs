@@ -20,7 +20,6 @@ namespace Turbo.Plugins.LightningMod
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
-                .IfSpecificBuffIsActive(Hud.Sno.SnoPowers.FuneraryPick).ThenNoCastElseContinue()//墓葬镐时不生效
                 .IfTrue(ctx =>
                 {
                     int range = 14;

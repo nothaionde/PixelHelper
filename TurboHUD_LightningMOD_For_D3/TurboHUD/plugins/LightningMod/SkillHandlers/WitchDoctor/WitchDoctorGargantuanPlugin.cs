@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace Turbo.Plugins.LightningMod
 {
@@ -30,8 +30,8 @@ namespace Turbo.Plugins.LightningMod
                         actor.SnoActor.Sno == ActorSnoEnum._wd_gargantuan_cooldown);
                     return exists;
                 }).ThenNoCastElseContinue()
-                .IfEliteOrBossNearbyCursor(ctx => 12).ThenCastElseContinue()
                 ;
+
         }
     }
 }

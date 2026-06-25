@@ -93,7 +93,6 @@
 
             return false;
         }
-        
         private void ExtremeSpeedModeMethod()
         {
             int x = Hud.Window.Size.Width / 2;

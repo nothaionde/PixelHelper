@@ -70,8 +70,8 @@
                     ;
                     return (BigBadVoodooCount == 0);//未站在大巫毒内时施放
                 }).ThenCastElseContinue()
-                ;
-
+                ;			 
+            
         }
     }
 }

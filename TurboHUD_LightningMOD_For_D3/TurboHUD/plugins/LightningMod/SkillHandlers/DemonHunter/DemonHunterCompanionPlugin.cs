@@ -1,4 +1,4 @@
-namespace Turbo.Plugins.LightningMod
+ï»¿namespace Turbo.Plugins.LightningMod
 {
     using System.Linq;
     using Turbo.Plugins.glq;
@@ -14,46 +14,55 @@ namespace Turbo.Plugins.LightningMod
         {
             base.Load(hud);
             AssignedSnoPower = Hud.Sno.SnoPowers.DemonHunter_Companion;
+
+            CreateCastRule()
+                .IfInTown().ThenNoCastElseContinue()
+                .IfCastingIdentify().ThenNoCastElseContinue()
+                .IfCastingPortal().ThenNoCastElseContinue()
+                .IfOnCooldown().ThenNoCastElseContinue()
+                .IfCanCastSimple().ThenCastElseContinue()
+                ;
+
             CreateCastRule()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfCanCastSimple().ThenContinueElseNoCast()
-                .IfTrue(ctx => ctx.Skill.Player.Stats.CooldownReduction >= 0.69 || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.ObsidianRingOfTheZodiac.Sno)).ThenCastElseContinue()//69CDR»ò»ÆµÀÊ±³ÖÐø±£³Ö
-                .IfTrue(ctx => ctx.Skill.Rune == 3 && ctx.Skill.Player.Stats.ResourcePctHatred < 15//òùòð·ûÎÄÔÚÔ÷ºÞµÍÓÚ15%Ê±Ê¹ÓÃ
+                .IfTrue(ctx => ctx.Skill.Player.Stats.CooldownReduction >= 0.69 || Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.ObsidianRingOfTheZodiac.Sno)).ThenCastElseContinue()//69CDRÂ»Ã²Â»Ã†ÂµÃ€ÃŠÂ±Â³Ã–ÃÃ¸Â±Â£Â³Ã–
+                .IfTrue(ctx => ctx.Skill.Rune == 3 && ctx.Skill.Player.Stats.ResourcePctHatred < 15//Ã²Ã¹Ã²Ã°Â·Ã»ÃŽÃ„Ã”ÃšÃ”Ã·ÂºÃžÂµÃÃ“Ãš15%ÃŠÂ±ÃŠÂ¹Ã“Ãƒ
                 ).ThenCastElseContinue()
-                .IfTrue(ctx => (ctx.Skill.Rune == 1 || ctx.Skill.Rune == 0 || ctx.Skill.Rune == 255) && ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40)//Ò°ÖíÖ©Öë·ûÎÄÔÚ40ÂëÄÚÓÐ¾«Ó¢»òBossÊ±Ê¹ÓÃ
+                .IfTrue(ctx => (ctx.Skill.Rune == 1 || ctx.Skill.Rune == 0 || ctx.Skill.Rune == 255) && ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40)//Ã’Â°Ã–Ã­Ã–Â©Ã–Ã«Â·Ã»ÃŽÃ„Ã”Ãš40Ã‚Ã«Ã„ÃšÃ“ÃÂ¾Â«Ã“Â¢Â»Ã²BossÃŠÂ±ÃŠÂ¹Ã“Ãƒ
                 ).ThenCastElseContinue()
                 .IfTrue(ctx =>
                 {
                     int CoeIndex = Hud.GetPlugin<PublicClassPlugin>().CoeIndex;
                     int PartyCoeIndex = Hud.GetPlugin<PublicClassPlugin>().PartyCoeIndex;
-                    if (ctx.Skill.Rune != 2 && Hud.Game.Me.GetSetItemCount(254427) < 2) return false;//·ÇÕ½ÀÇ·ûÎÄÇÒ²»´øÂÓ¶áÌ×
+                    if (ctx.Skill.Rune != 2 && Hud.Game.Me.GetSetItemCount(254427) < 2) return false;//Â·Ã‡Ã•Â½Ã€Ã‡Â·Ã»ÃŽÃ„Ã‡Ã’Â²Â»Â´Ã¸Ã‚Ã“Â¶Ã¡ÃŒÃ—
                     bool _cast;
                     var DPSPlayer = ctx.Hud.Game.Players.FirstOrDefault(p => p.InGreaterRift &&
-                p.Powers.UsedLegendaryPowers.ConventionOfElements?.Active == true//ÔªËØ½äÖ¸
+                p.Powers.UsedLegendaryPowers.ConventionOfElements?.Active == true//Ã”ÂªÃ‹Ã˜Â½Ã¤Ã–Â¸
                 );
 
                     if (DPSPlayer != null)
                     {
-                        double CoeLeftTime = PublicClassPlugin.GetHighestElementLeftSecondAssingedPlayer(Hud, DPSPlayer, PartyCoeIndex);//»ñÈ¡Àë¶ÓÎéDPS×î¸ßÔªËØµ¹¼ÆÊ±
-                        _cast = CoeLeftTime < 6 && CoeLeftTime > 0;//±¬·¢ÔªËØÇ°6Ãë
+                        double CoeLeftTime = PublicClassPlugin.GetHighestElementLeftSecondAssingedPlayer(Hud, DPSPlayer, PartyCoeIndex);//Â»Ã±ÃˆÂ¡Ã€Ã«Â¶Ã“ÃŽÃ©DPSÃ—Ã®Â¸ÃŸÃ”ÂªÃ‹Ã˜ÂµÂ¹Â¼Ã†ÃŠÂ±
+                        _cast = CoeLeftTime < 6 && CoeLeftTime > 0;//Â±Â¬Â·Â¢Ã”ÂªÃ‹Ã˜Ã‡Â°6ÃƒÃ«
                     }
-                    else if (Hud.Game.Me.Powers.BuffIsActive(430674))//ÔªËØ½ä
+                    else if (Hud.Game.Me.Powers.BuffIsActive(430674))//Ã”ÂªÃ‹Ã˜Â½Ã¤
                     {
-                        double CoeLeftTime = PublicClassPlugin.GetHighestElementLeftSecond(Hud, ctx.Skill.Player, CoeIndex);//»ñÈ¡Àë×Ô¼º×î¸ßÔªËØµ¹¼ÆÊ±
+                        double CoeLeftTime = PublicClassPlugin.GetHighestElementLeftSecond(Hud, ctx.Skill.Player, CoeIndex);//Â»Ã±ÃˆÂ¡Ã€Ã«Ã—Ã”Â¼ÂºÃ—Ã®Â¸ÃŸÃ”ÂªÃ‹Ã˜ÂµÂ¹Â¼Ã†ÃŠÂ±
                         _cast = CoeLeftTime < 6 && CoeLeftTime > 0 && ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40);
                     }
                     else
                     {
-                        _cast = ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false);//ÔâÓö¾«Ó¢Ê±Ê©·Å
+                        _cast = ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40, false);//Ã”Ã¢Ã“Ã¶Â¾Â«Ã“Â¢ÃŠÂ±ÃŠÂ©Â·Ã…
                     }
                     return _cast;
                 }).ThenCastElseContinue()
-                .IfTrue(ctx => ctx.Skill.Rune == 4 && ctx.Hud.Game.ActorQuery.NearestHealthGlobe != null && ctx.Hud.Game.ActorQuery.NearestHealthGlobe.NormalizedXyDistanceToMe <= 60 && ctx.Skill.Player.Defense.HealthPct < 60//Ñ©õõ·ûÎÄÔÚ60ÂëÄÚÓÐÑªÇò²¢ÇÒÉúÃüµÍÓÚ60%Ê±Ê¹ÓÃ
+                .IfTrue(ctx => ctx.Skill.Rune == 4 && ctx.Hud.Game.ActorQuery.NearestHealthGlobe != null && ctx.Hud.Game.ActorQuery.NearestHealthGlobe.NormalizedXyDistanceToMe <= 60 && ctx.Skill.Player.Defense.HealthPct < 60//Ã‘Â©ÃµÃµÂ·Ã»ÃŽÃ„Ã”Ãš60Ã‚Ã«Ã„ÃšÃ“ÃÃ‘ÂªÃ‡Ã²Â²Â¢Ã‡Ã’Ã‰ÃºÃƒÃ¼ÂµÃÃ“Ãš60%ÃŠÂ±ÃŠÂ¹Ã“Ãƒ
                 ).ThenCastElseContinue()
-                .IfTrue(ctx => Hud.Game.Me.GetSetItemCount(254427) >= 2 && !Hud.Game.Me.Powers.BuffIsActive(430674) &&(ctx.Skill.Player.Stats.ResourcePctHatred < 15 || ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40) || (ctx.Hud.Game.ActorQuery.NearestHealthGlobe != null && ctx.Hud.Game.ActorQuery.NearestHealthGlobe.NormalizedXyDistanceToMe <= 60 && ctx.Skill.Player.Defense.HealthPct < 60))//ÂÓ¶áÌ×ÇÒ²»´øÔªËØ½äÊ±
+                .IfTrue(ctx => Hud.Game.Me.GetSetItemCount(254427) >= 2 && !Hud.Game.Me.Powers.BuffIsActive(430674) &&(ctx.Skill.Player.Stats.ResourcePctHatred < 15 || ctx.Hud.Game.ActorQuery.IsEliteOrBossCloserThan(40) || (ctx.Hud.Game.ActorQuery.NearestHealthGlobe != null && ctx.Hud.Game.ActorQuery.NearestHealthGlobe.NormalizedXyDistanceToMe <= 60 && ctx.Skill.Player.Defense.HealthPct < 60))//Ã‚Ã“Â¶Ã¡ÃŒÃ—Ã‡Ã’Â²Â»Â´Ã¸Ã”ÂªÃ‹Ã˜Â½Ã¤ÃŠÂ±
                 ).ThenCastElseContinue()
                 ;
         }

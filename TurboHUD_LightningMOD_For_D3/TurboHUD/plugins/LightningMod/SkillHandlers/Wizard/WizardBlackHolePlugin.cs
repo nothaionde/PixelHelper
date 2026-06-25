@@ -24,7 +24,7 @@ namespace Turbo.Plugins.LightningMod
                 .IfPrimaryResourceIsEnough(0, ctx => 0).ThenContinueElseNoCast()
                 .IfEliteOrBossIsNearby(ctx => 80).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
-                ctx.Skill.Player.GetSetItemCount(84014) >= 6 && ctx.Skill.Player.Powers.UsedLegendaryPowers.Deathwish?.Active == true).ThenNoCastElseContinue()//火鸟6件时无效
+                ctx.Skill.Player.GetSetItemCount(84014) >= 6 && ctx.Skill.Player.Powers.UsedLegendaryPowers.Deathwish?.Active == true).ThenNoCastElseContinue()//火鸟6件时无效															   
                 .IfTrue(ctx =>
                 {
                     int CoeIndex = Hud.GetPlugin<PublicClassPlugin>().CoeIndex;

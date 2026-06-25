@@ -272,13 +272,23 @@
                     if(skillStrafe.Key == ActionKey.LeftSkill) Hud.Interaction.StandStillUp();
                     DelayTimer2.Restart();
                 }
+
+                bool hasBastions = Hud.Game.Me.Powers.BuffIsActive(359583);
+                var focusBuff = Hud.Game.Me.Powers.GetBuff(359583);
+
+                bool needFocus = hasBastions && (focusBuff == null || focusBuff.TimeLeftSeconds[1] < 0.8f);
+
                 if (SetItemCount >= 4 && isZhuisao)
                 {
                     DoHungeringArrow();
                 }
                 else if (SetItemCount >= 4)
                 {
-                    if (Hud.Game.ActorQuery.OnScreenMonsterCount == 0)
+                    if (needFocus)
+                    {
+                        DoHungeringArrow();
+                    }
+                    else if (Hud.Game.ActorQuery.OnScreenMonsterCount == 0)
                     {
                         if(PublicClassPlugin.GetBuffCount(Hud, 484289, 10) <= 16)
                             DoHungeringArrow();

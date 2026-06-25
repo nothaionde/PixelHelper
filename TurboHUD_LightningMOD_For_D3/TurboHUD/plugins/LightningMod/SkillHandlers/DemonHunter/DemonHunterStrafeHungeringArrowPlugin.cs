@@ -18,7 +18,7 @@
         private string str_tip;
         private string str_tip2;
         public bool isHideTip { get; set; }
-        public bool Running { get; private set; }
+        public static bool Running { get; set; }
         public int dongneng { get; set; }
         private bool isStrafeDH = false;
         private int SetItemCount = 0;
@@ -42,7 +42,7 @@
         public override void Load(IController hud)
         {
             base.Load(hud);
-            ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.R, false, false, false);
+            ToggleKeyEvent = Hud.Input.CreateKeyEvent(true, Key.F3, false, false, false);
             zhuisao = Hud.Input.CreateKeyEvent(true, Key.F4, false, false, false);
             InfoFont1 = Hud.Render.CreateFont("tahoma", 8, 255, 200, 200, 0, true, false, 255, 0, 0, 0, true);
             InfoFont2 = Hud.Render.CreateFont("tahoma", 8, 255, 0, 255, 0, true, false, 255, 0, 0, 0, true);
@@ -57,7 +57,7 @@
     }
         public void OnKeyEvent(IKeyEvent keyEvent)
         {
-            if (ToggleKeyEvent.Matches(keyEvent) && keyEvent.IsPressed && isStrafeDH && !Hud.Inventory.InventoryMainUiElement.Visible)
+            if (Hud.GetPlugin<PickUpPlugin>().WaitingforClick == false && ToggleKeyEvent.Matches(keyEvent) && keyEvent.IsPressed && isStrafeDH && !Hud.Inventory.InventoryMainUiElement.Visible)
             {
                 if(Running)
                 {
@@ -106,10 +106,10 @@
         }
         public void PaintTopInGame(ClipState clipState)
         {
-            //if (clipState != ClipState.AfterClip)
-            //{
-            //    return;
-            //}
+            if (clipState != ClipState.AfterClip)
+            {
+                return;
+            }
             if (Hud.CurrentLanguage == Language.zhCN)
             {
                 str_running1 = "正在扫射，" + ToggleKeyEvent + "键停止，" + zhuisao + "键开启高频模式";
@@ -183,6 +183,14 @@
                     }
                     if (skillPrimary != null) break;
                 }
+            }
+            if (!Hud.Game.IsInTown && !glq.PublicClassPlugin.IsGuardianDead(Hud))
+            {
+                Running = false;
+            }
+            else
+            {
+                Running = true;
             }
             if (Hud.Game.IsInTown)
             {

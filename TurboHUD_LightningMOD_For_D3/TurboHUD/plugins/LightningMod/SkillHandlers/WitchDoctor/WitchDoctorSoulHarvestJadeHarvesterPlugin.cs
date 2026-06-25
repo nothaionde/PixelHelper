@@ -1,4 +1,4 @@
-ï»¿namespace Turbo.Plugins.LightningMod
+namespace Turbo.Plugins.LightningMod
 {
     using System.Linq;
     public class WitchDoctorSoulHarvestJadeHarvesterPlugin : AbstractSkillHandler, ISkillHandler
@@ -25,32 +25,32 @@
                 .IfEnoughMonstersNearby(ctx => 18, ctx => 1).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
                 {
-                    return (Hud.Game.Me.GetSetItemCount(842970) >= 6);//ç‰é­‚6ä»¶
+                    return (Hud.Game.Me.GetSetItemCount(842970) >= 6);//Óñ»ê6¼ş
                 }
                 ).ThenContinueElseNoCast()
-                .IfTrue(ctx =>//çµè¡Œè¿›æ€ªå †æ²¡å‡ä¼¤BUFFæ—¶ä¼˜å…ˆè€ƒè™‘å±‚æ•°
+                .IfTrue(ctx =>//ÁéĞĞ½ø¹Ö¶ÑÃ»¼õÉËBUFFÊ±ÓÅÏÈ¿¼ÂÇ²ãÊı
                 {
-                    int Stacks = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.SacredHarvester.Sno) == true ? 10 : 5;//æ”¶å‰²åˆ€
+                    int Stacks = ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.SacredHarvester.Sno) == true ? 10 : 5;//ÊÕ¸îµ¶
                     return (
-                    !ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest.Sno, 5) &&//æ²¡æœ‰6ä»¶å¥—å‡ä¼¤BUFF
-                    ctx.Skill.Player.Density.GetDensity(18) >= Stacks//æ»¡è¶³æœ€å¤§å±‚æ•°
+                    !ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest.Sno, 5) &&//Ã»ÓĞ6¼şÌ×¼õÉËBUFF
+                    ctx.Skill.Player.Density.GetDensity(18) >= Stacks//Âú×ã×î´ó²ãÊı
                     )
                     ;
                 }).ThenCastElseContinue()
                 .IfTrue(ctx =>
                 {
-                    var monsters = Hud.Game.AliveMonsters.Where(m => ((m.SummonerAcdDynamicId == 0 && m.IsElite) || !m.IsElite) && m.NormalizedXyDistanceToMe <= 18);//18ç å†…é™¤å¹»æœ¯ä»¥å¤–æ€ª
+                    var monsters = Hud.Game.AliveMonsters.Where(m => ((m.SummonerAcdDynamicId == 0 && m.IsElite) || !m.IsElite) && m.NormalizedXyDistanceToMe <= 18);//18ÂëÄÚ³ı»ÃÊõÒÔÍâ¹Ö
                     int Count = 0;
-                    bool RingOfEmptiness = Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.RingOfEmptiness.Sno, 0);//ç©ºè™šä¹‹æˆ’
+                    bool RingOfEmptiness = Hud.Game.Me.Powers.BuffIsActive(Hud.Sno.SnoPowers.RingOfEmptiness.Sno, 0);//¿ÕĞéÖ®½ä
                     foreach (var monster in monsters)
                     {
                         if(RingOfEmptiness)
                         {
-                            if (monster.Haunted || monster.Locust) Count++;//è™«ç¾¤å’Œèš€é­‚æ€ªç‰©è®¡æ•°
+                            if (monster.Haunted || monster.Locust) Count++;//³æÈººÍÊ´»ê¹ÖÎï¼ÆÊı
                         }
                        else
                         {
-                            if (monster.Haunted) Count++;//è™«ç¾¤å’Œèš€é­‚æ€ªç‰©è®¡æ•°
+                            if (monster.Haunted) Count++;//³æÈººÍÊ´»ê¹ÖÎï¼ÆÊı
                         }
                     }
                     return (Count >= 1 && ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest.Sno, 5));
@@ -65,10 +65,10 @@
                 .IfEnoughMonstersNearby(ctx => 18, ctx => 1).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
                 {
-                    return (Hud.Game.Me.GetSetItemCount(842970) >= 6 && ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest.Sno, 0));//ç‰é­‚6ä»¶åŠæœ‰æ”¶å‰²BUFF
+                    return (Hud.Game.Me.GetSetItemCount(842970) >= 6 && ctx.Skill.Player.Powers.BuffIsActive(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest.Sno, 0));//Óñ»ê6¼ş¼°ÓĞÊÕ¸îBUFF
                 }
                 ).ThenContinueElseNoCast()
-                .IfSpecificBuffIsAboutToExpire(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest, 5, 300, 500).ThenCastElseContinue()//ä¼˜å…ˆè€ƒè™‘å‡ä¼¤buff
+                .IfSpecificBuffIsAboutToExpire(Hud.Sno.SnoPowers.WitchDoctor_SoulHarvest, 5, 300, 500).ThenCastElseContinue()//ÓÅÏÈ¿¼ÂÇ¼õÉËbuff
                 ;
 
         }

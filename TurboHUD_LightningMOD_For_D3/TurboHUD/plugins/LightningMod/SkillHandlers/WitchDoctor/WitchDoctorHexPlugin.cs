@@ -1,4 +1,4 @@
-﻿namespace Turbo.Plugins.LightningMod
+namespace Turbo.Plugins.LightningMod
 {
     using System.Linq;
 

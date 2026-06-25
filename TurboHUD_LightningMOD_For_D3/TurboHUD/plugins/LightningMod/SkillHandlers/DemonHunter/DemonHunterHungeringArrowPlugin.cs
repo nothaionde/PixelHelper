@@ -21,7 +21,7 @@
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfCanCastSimple().ThenContinueElseNoCast()
                 .IfTrue(ctx => ctx.Skill.Player.Powers.BuffIsActive(359583, 0)).ThenContinueElseNoCast()//装备守心克己
-                .IfEnoughMonstersInSector(ctx => 40, ctx => 80, ctx => 6.9f , ctx => 1).ThenContinueElseNoCast()
+                .IfEnoughMonstersInSector(ctx => 40, ctx => 80, ctx => Hud.Window.Size.Height / 11.33333f , ctx => 1).ThenContinueElseNoCast()
                 .IfSpecificBuffIsAboutToExpire(hud.Sno.SnoPowers.Generic_ItemPassiveUniqueRing735x1, 1, 100, 300).ThenCastElseContinue()
                 ;
             //保持明彻裹腕

@@ -45,12 +45,12 @@
             Enabled = true;
             TurnedOn = false;
             Running = false;
-            ExtremeSpeedMode = true;
-            SalvageAncient = 2;//0智能分解远古，1不分解远古，2分解全部远古
-            SalvagePrimal = 2;//0智能分解太古，1不分解太古，2分解全部太古
-            SalvageEthereal = 2;//0智能分解无形，1不分解无形，2分解全部无形
-            SalvagePotion = 1;// 0智能分解传奇药水，1分解全部传奇药水
-            SalvageSoulshard = 1;//0智能分解灵魂碎片，1分解全部0级灵魂碎片
+            ExtremeSpeedMode = false;
+            SalvageAncient = 0;//0智能分解远古，1不分解远古，2分解全部远古
+            SalvagePrimal = 0;//0智能分解太古，1不分解太古，2分解全部太古
+            SalvageEthereal = 0;//0智能分解无形，1不分解无形，2分解全部无形
+            SalvagePotion = 0;// 0智能分解传奇药水，1分解全部传奇药水
+            SalvageSoulshard = 0;//0智能分解灵魂碎片，1分解全部0级灵魂碎片
             SalvageWhisperOfAtonement = false;//分解125级以下赎罪低语宝石
         }
 
@@ -196,7 +196,7 @@
         }
         private bool isBetterPotion(IItem Potion)
         {
-            bool newPotion = !Hud.Game.Items.Any(i => i.SnoItem.Code.StartsWith("HealthPotionLegendary") && (i.Location == ItemLocation.Stash || i.Location == ItemLocation.MerchantAvaibleItemsForPurchase) && i.SnoItem.NameEnglish == Potion.SnoItem.NameEnglish && i != Potion);
+            bool newPotion = !Hud.Game.Items.Any(i => i.SnoItem.Code.StartsWith("HealthPotionLegendary") && (i.Location == ItemLocation.Stash || i.Location == ItemLocation.Inventory || i.Location == ItemLocation.MerchantAvaibleItemsForPurchase) && i.SnoItem.NameEnglish == Potion.SnoItem.NameEnglish && i != Potion);
             if (newPotion)
             {
                 return true;
@@ -218,6 +218,7 @@
                 }
                 return false;
             }
+            
         }
         private double PotionPerfection(IItem Potion)
         {
@@ -227,24 +228,17 @@
                 var MaxStat = perfection.Max;
                 var Percentage = Math.Truncate(((CurStat / MaxStat) * 100) * 10) / 10;
                 if (Percentage != 100)
+                {
                     return Percentage;
+                }
             }
-            return 100;
+            return 0;
         }
         private bool CanSalvage(IItem item)
         {
-            return (!UseInventoryLock || !item.IsInventoryLocked) &&
-                item.ItemsInSocket == null &&
-                item.EnchantedAffixCounter == 0 &&
-                item.SnoItem.Sno != 1661412389 &&//旧手斧
-                item.SnoItem.Sno != 1815806856 &&//圆盾
-                item.SnoItem.Sno != 3382510415 &&//生锈连枷
-                item.SnoItem.Sno != 4176712417 &&//圣教军盾
-                item.SnoItem.Sno != 3931575626 &&//新兵手弩
-                item.SnoItem.Sno != 1236604967 &&//磨损的铁指套
-                item.SnoItem.Sno != 111732407 &&//学徒镰刀
-                item.SnoItem.Sno != 3659697712 &&//简易小刀
-                item.SnoItem.Sno != 88665049 &&//学员魔杖
+            return (!UseInventoryLock || !item.IsInventoryLocked) && 
+                item.ItemsInSocket == null && 
+                item.EnchantedAffixCounter == 0 && 
                 (item.SnoItem.MainGroupCode != "riftkeystone") && 
                 (item.SnoItem.MainGroupCode != "horadriccache") && 
                 (item.SnoItem.MainGroupCode != "-") && 
@@ -271,15 +265,14 @@
         private List<IItem> GetItemsToSalvage()
         {
             var result = new List<IItem>();
-           
             foreach (var item in Hud.Inventory.ItemsInInventory)
             {
                 if (item.SnoItem.Kind != ItemKind.loot && item.SnoItem.Kind != ItemKind.potion) continue;
                 if (item.VendorBought) continue;
+
                 var canSalvage = CanSalvage(item);
                 if (canSalvage) result.Add(item);
             }
-
             result.Sort((a, b) =>
             {
                 var r = a.InventoryX.CompareTo(b.InventoryX);

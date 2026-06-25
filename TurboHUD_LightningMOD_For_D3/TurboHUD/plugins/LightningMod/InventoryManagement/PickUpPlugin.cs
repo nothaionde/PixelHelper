@@ -37,7 +37,7 @@
         public bool isItemsAround = false;
         public bool Clicking = false;
         public bool WaitingforClick = false;
-        public double PickupRadius = 10;
+        public int PickupRadius = 10;
         private readonly HashSet<uint> _clickedAnnIds = new HashSet<uint>();
         private readonly HashSet<string> Whitelist = new HashSet<string>() { };
         private readonly HashSet<string> Blacklist = new HashSet<string>() { };
@@ -182,7 +182,6 @@
             }
             inventoryFreeSpace = Hud.Game.Me.InventorySpaceTotal - Hud.Game.InventorySpaceUsed;
             bool? has1x2free = null;
-            var DiabolicalChest = Hud.Game.Actors.Where(x => x.IsOnScreen && !x.IsDisabled && !x.IsOperated && x.SnoActor.NameEnglish == "Diabolical Chest").FirstOrDefault();
             var Items = Hud.Game.Items.Where(item =>
             {
                 if (WhenForceMoveInvalid && Hud.Interaction.IsHotKeySet(ActionKey.Move) && Hud.Interaction.IsContinuousActionStarted(ActionKey.Move))
@@ -190,8 +189,6 @@
                 if (item.Location != ItemLocation.Floor || !item.IsOnScreen || item.NormalizedXyDistanceToMe > PickupRadius || (item.AccountBound && !item.BoundToMyAccount))
                     return false;
                 if (_clickedAnnIds.Contains(item.AnnId))
-                    return false;
-                if (DiabolicalChest != null && item.FloorCoordinate.XYDistanceTo(DiabolicalChest.FloorCoordinate) < 10)
                     return false;
                 if (Whitelist.Contains(item.SnoItem.NameLocalized.ToLower()))//白名单物品（比如“团结”）
                     return true;
@@ -216,7 +213,7 @@
                     return true;
 
                 if (PickCraft && item.SnoItem.Sno == 2087837753)//死亡之息
-                    return true;
+                    return false;
                 if (PickCraft && item.SnoItem.NameEnglish == "Ramaladni's Gift" && CalculateStackItemfreeSpace(item, 100))//打孔器
                     return true;
                 
@@ -375,8 +372,8 @@
             }
             else
             {
-                str_Info = "press " + ToggleKeyEvent.ToString() + " to pick up";
-                str_Running = "press " + ToggleKeyEvent.ToString() + " to stop";
+                str_Info = "press " + ToggleKeyEvent.ToString() + "to pick up";
+                str_Running = "press " + ToggleKeyEvent.ToString() + "to stop";
             }
             if (!AutoPickupOutTown || Hud.Game.Me.IsInTown)
             {
