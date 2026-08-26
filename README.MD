@@ -1,160 +1,61 @@
-Pixel Helper For Diablo III
+# PixelHelper for Diablo III
 
-This repository contains my personal plugins and patches for Diablo 3 that I’ve used with TurboHUD Lightning Mod.
-Works with the free version!
+An automated state engine and custom filtering framework built in C# (.NET), focusing on runtime process automation, memory interaction, and UI extension.
 
-Installation
+---
 
-Download the latest version of ([TurboHUD Lightning Mod](https://www.turbohud.com.cn/)).
+## Technical Architecture & Highlights
 
-Copy the files from this repository into the root folder of TurboHUD, replacing existing files when asked.
+* **Finite State Machine (FSM):** Orchestrates multi-step asynchronous town routines (salvaging, gambling, rift management) with built-in idle fallbacks and edge-case recovery.
+* **Process Interop & Memory Patching:** Utilizes managed/unmanaged interop (`DllImport`) for runtime DLL modification and low-level memory interaction.
+* **Dynamic Evaluation Engine:** Rule-based filtering system evaluating real-time in-game object attributes (affixes, quality thresholds, item properties).
+* **Modular Infrastructure:** Designed with clean boundary separation between state logic, memory patching, and client extensions.
 
-To use with the free version, you also need to replace Turbo.cnmgr.dll.
+---
 
-In recent versions, the developers added a feature that checks if free version is using DllImport. It need to be used to apply ZoomHack and few other 3rd party plugins.
+## Features & Overview
 
-Right now, replacing the DLL is enough. If this changes in the future and I don’t release a patch, reach out to me on Discord (link available in the helper).
+### Camera Zoom
+* Unlocks in-game camera zoom-out capability directly from TurboHUD.
+* Fully compatible with standard plugin setups.
 
-When launching TurboHUD, do not update files. Just close the update prompt — TurboHUD will still run.
+### Custom Loot Filter
+* **Affix & Quality Evaluation:** Real-time matching based on ancient status, affix names, and item sub-types.
+* **Organization:** Group-based filter rules, fast toggle checkboxes, right-click context menus, and drag-and-drop ordering.
 
-Features
-Camera Zoom
+### Town Automation (Act 1 / Tristram)
+* **Finite State Loop:** Executes sequential routines after Greater Rift completions or game launches.
+* **Blood Shard Gambling:** Auto-gambles when shards exceed standard limits.
+* **Inventory Management:** Automatically salvages items not whitelisted in your active loot filter.
+* **Paragon & Portal Management:** Handles Paragon point distribution and automatic rift re-opening/closing.
 
-A plugin that unlocks the camera zoom out.
+### Additional Utilities
+* **Auto Pickup:** Automated loot collection pipeline.
+* **Pylon Automation:** Auto-activates pylons when Nemesis Bracers are detected.
+* **Gem Leveling:** Prioritizes and upgrades lowest-level legendary gems automatically.
 
-Works directly from TurboHUD.
+---
 
-Fully compatible with other TurboHUD plugins.
+## Installation
 
-Custom Loot Filter
+1. Download and extract the latest release of **TurboHUD Lightning Mod**.
+2. Copy all files from this repository into the root TurboHUD folder (overwrite existing files when prompted).
+3. Ensure `Turbo.cnmgr.dll` is replaced to allow runtime interop patches for camera unlocked features.
+4. Launch TurboHUD. When prompted with update windows, close them to retain patch compatibility.
 
-Enter the name of an item and see existing in-game matches in a list.
+---
 
-Choose its ancient quality and secondary affix.
+Markdown
+## FAQ & Support
 
-Organize filters into groups for different builds or goals.
+**Q: Does this work with the free version of TurboHUD Lightning Mod?**  
+*A: Yes, replacing `Turbo.cnmgr.dll` as outlined in the installation steps enables full compatibility.*
 
-Disable filters temporarily with a checkbox.
+**Q: Is this the latest development version?**  
+*A: This repository hosts the **latest stable release**. Bleeding-edge patches and hotfixes are rolled out dynamically before being merged here into major releases.*
 
-Manage filters via right-click menu: add, delete, rename.
+**Q: How do I report urgent bugs or request immediate support?**  
+*A: For fast, same-day support and hotfixes, reach out via **Discord** `[https://discord.com/users/534628155474968608]`. GitHub Issues are checked periodically for major stable updates, while live troubleshooting happens on Discord.*
 
-Drag & drop items between groups.
-
-Full Town Automation
-
-Works only in Act 1 (Tristram).
-
-After completing a Greater Rift or starting a new game, a state machine takes over:
-
-Teleports to Act 1 if “Always Act 1” is enabled.
-
-Checks for blood shards. If above 100 and “Auto Gamble” is enabled → auto gambles.
-
-Salvages items not included in your loot filter.
-
-Assings Paragon points automatically.
-
-Closes Greater Rifts and can auto-open a new one.
-
-Not always reliable in groups: if your party is too slow, the helper will enter idle state.
-
-Auto Pickup
-
-Automatically picks up loot.
-
-Pylon Automation
-
-Auto-clicks pylons if you are wearing Nemesis Bracers.
-
-Legendary Gem Leveling
-
-Automatically upgrades gems.
-
-Prioritizes lowest-level gems first.
-
-FAQ
-
-Q: Does this work with the free version of TurboHUD Lightning Mod?
-A: Yes 
-
-Just replace Turbo.cnmgr.dll as described above.
-
-Q: What if the DLL patch stops working in future updates?
-A:
-
-Contact me via Discord (link is included in the helper).
-
-I’ll release a fix if possible.
-
-Q: Can I use this with my existing plugins?
-A: Yes 
-
-The helper runs alongside all other TurboHUD plugins.
-
-Q: What happens if I accidentally update TurboHUD files on startup?
-A:
-
-Simply close the update window.
-
-TurboHUD will still run without updating.
-
-Q: Does the automation work in groups?
-A: Yes, but with limitations 
-
-If your party is too slow, the helper will go idle and will not open a new portal.
-
-Gambling and salvaging always work.
-
-Auto Accept:
-
-Presses Accept only after gambling and salvaging are complete.
-
-If these options are unchecked → it will accept immediately.
-
-Q: Why aren’t bugs fixed quickly?
-A:
-
-Only a few people use this helper.
-
-If something bothers me (or them), I fix it myself.
-
-Q: Can I build a bot on top of this?
-A: Technically, yes
-
-The helper already supports automatic skill usage, which is easy to configure.
-
-The hard part is map logic, which I don’t release (closed source).
-
-Act 1 automation is already bot-like: it doesn’t play the game for you, but reduces downtime in town.
-
-Q: Will there be updates with new features?
-A: Yes 
-
-If I receive requests, I add features.
-
-The project is 100% free — no donations, no sales.
-
-Q: Can you get banned for using this?
-A: Very unlikely 
-
-Only if Blizzard bans TurboHUD itself (almost impossible).
-
-Plugins are part of TurboHUD, not separate software.
-
-Q: I need help with setup or usage.
-A:
-
-I don’t provide support for basic questions (“How do I install TurboHUD?”).
-
-For plugin-related questions (mine or others) — feel free to ask.
-
-But please first check TurboHUD’s built-in interfaces: almost everything is explained there.
-
-Q: Are there any exceptions or issues?
-A: Yes 
-
-Everything works, but some old auto-skill plugins from Lightning Mod are included.
-
-These are not my code, so I cannot fix or change them (Lazy).
-
-They do not affect the functionality of Pixel Helper.
+**Q: Can I use this with existing third-party plugins?**  
+*A: Yes, PixelHelper runs as a modular extension alongside standard TurboHUD plugins.*
