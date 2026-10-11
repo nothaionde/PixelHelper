@@ -15,11 +15,32 @@
     {
         public void Customize()
         {
+            Hud.GetPlugin<DemonHunterEntanglingShotPlugin>().Enabled = Hud.GetPlugin<DemonHunterEvasiveFirePlugin>().Enabled;
             Hud.GetPlugin<DemonHunterBolasPlugin>().Enabled = Hud.GetPlugin<DemonHunterEvasiveFirePlugin>().Enabled;
             Hud.GetPlugin<DemonHunterHungeringArrowPlugin>().Enabled = Hud.GetPlugin<DemonHunterEvasiveFirePlugin>().Enabled;
             Hud.GetPlugin<NecNayrsBlackDeath_BoneSpikesPlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
-            Hud.GetPlugin<BarbarianLeapPlugin>().Enabled = Hud.GetPlugin<BarbarianBandofMightPlugin>().Enabled;																						   
-
+            Hud.GetPlugin<BarbarianLeapPlugin>().Enabled = Hud.GetPlugin<BarbarianBandofMightPlugin>().Enabled;
+            Hud.GetPlugin<MonkFistsOfThunderPlugin>().Enabled = Hud.GetPlugin<MonkDeadlyReachPlugin>().Enabled;
+            Hud.GetPlugin<WizardArchonArcaneBlastColdPlugin>().Enabled = Hud.GetPlugin<WizardArchonArcaneBlastPlugin>().Enabled;
+            Hud.GetPlugin<WizardArchonArcaneBlastFirePlugin>().Enabled = Hud.GetPlugin<WizardArchonArcaneBlastPlugin>().Enabled;
+            Hud.GetPlugin<WizardArchonArcaneBlastLightningPlugin>().Enabled = Hud.GetPlugin<WizardArchonArcaneBlastPlugin>().Enabled;
+            Hud.GetPlugin<WizardTriumvirate_SpectralBladePlugin>().Enabled = Hud.GetPlugin<WizardTriumvirate_ShockPulsePlugin>().Enabled;
+            Hud.GetPlugin<WizardTriumvirate_MagicMissilePlugin>().Enabled = Hud.GetPlugin<WizardTriumvirate_ShockPulsePlugin>().Enabled;
+            Hud.GetPlugin<WizardTriumvirate_ElectrocutePlugin>().Enabled = Hud.GetPlugin<WizardTriumvirate_ShockPulsePlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_BoneSpearPlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_BoneSpikesPlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_SiphonBloodPlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_SkeletalMagePlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_DeathNovaPlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_CommandSkeletonsPlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_RevivePlugin>().Enabled = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().Enabled;
+            Hud.GetPlugin<NecNayrsBlackDeath_BoneSpearPlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
+            Hud.GetPlugin<NecNayrsBlackDeath_BoneSpikesPlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
+            Hud.GetPlugin<NecNayrsBlackDeath_SiphonBloodPlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
+            Hud.GetPlugin<NecNayrsBlackDeath_SkeletalMagePlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
+            Hud.GetPlugin<NecNayrsBlackDeath_DeathNovaPlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
+            Hud.GetPlugin<NecNayrsBlackDeath_CommandSkeletonsPlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
+            Hud.GetPlugin<NecNayrsBlackDeath_RevivePlugin>().InvalidWhenForceMove = Hud.GetPlugin<NecNayrsBlackDeath_BoneArmorPlugin>().InvalidWhenForceMove;
 
         }
         public ISnoPower AssignedSnoPower { get; protected set; }
@@ -142,8 +163,12 @@
                     case CastType.BuffSkill:
                         break;
                     case CastType.RangedChannelingSkill:
-                        Hud.Interaction.StopContinuousAction(skill.Key);
-                        if (skill.Key == ActionKey.LeftSkill) Hud.Interaction.StandStillUp();
+                        if(Hud.Interaction.IsContinuousActionStarted(skill.Key))
+                        {
+                            Hud.Interaction.StopContinuousAction(skill.Key);
+                            if (skill.Key == ActionKey.LeftSkill)
+                                Hud.Interaction.StandStillUp();
+                        }
                         skill.LastReleased.Restart();
                         //Hud.Debug("stop channeling " + skill.SnoPower.NameLocalized);
                         break;

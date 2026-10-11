@@ -1,0 +1,63 @@
+PartyProcTracker tracks the procs of all seen party members as countdown bars and shows the time remaining even if they (or you) leave the area.
+
+To Do:
+- add display for proc and death counts
+- tie the icon, bar height and fonts to the IMovable resizing feature
+
+Changelog:
+July 31, 2021
+	- shifted the default starting position down slightly to avoid overlap with a minimap IMenuDock
+July 4, 2021
+	- Tweaked follower tts string for the reader to say proc instead of spell out p-r-o-c
+April 4, 2021
+	- Added follower cheat death passive to proc rules list
+	- Updated the Firebird 2pc id for Patch 2.7
+December 27, 2020
+	- Fixed false positive callouts of Simulacrum loss
+September 26, 2020
+	- Fixed Ancestor's Grace being counted twice as an Extra Life for a Barbarian
+September 8, 2020
+	- Fixed incorrect name appearing in the proc list
+September 3, 2020
+	- Added Skeleton King's Pauldrons proc
+	- Changed the code to allow for outside edits (i.e. Customize()) to AncestorsGraceRule and SkeletonKingsPauldronsRule
+August 3, 2020
+	- Fixed Crusader's Prophet proc from being announced more than once per activation
+	- Moved the player name sanity check from PaintArea to AfterCollect
+August 1, 2020
+	- Attempt at fixing the occasional issue where Player names are not drawn next to their proc bars (could not reproduce the issue on demand)
+July 28, 2020
+	- Fixed Simulacrum down audio notifications happening while the sims are still alive (buff flickers a little sometimes?)
+July 27, 2020
+	- Fixed Simulacrum: Self-Sacrifice checking
+	- Added Ancestor's Grace checking for all classes
+July 25, 2020
+	- Added proc counting bookkeeping
+	- Changed IProcHandler function signature to pass the entire PlayerProcInfo data object
+	- Moved ProcRule, PlayerProcInfo, ProcInfo class definitions into their own files
+	- Moved screenshot code into its own example plugin (but screenshot functionality in TH doesn't work in any meaningful difficulty anymore)
+July 24, 2020
+	- Implemented custom eligibility checks for extra lives that come from activated abilities (Simulacrum, Akarat's Champion)
+	- Added Simulacrum: Self-Sacrifice for the Necromancer
+	- Fixed incorrect SoundEnabled check
+	- Added extra life tracking icons under the player portrait icons
+	- Added Beckon Sail to the Demon Hunter's proc tracker definition
+July 23, 2020
+	- Implemented the bookkeeping for the concept of extra lives
+July 18, 2020
+	- Implemented IProcHandler.OnProcStart and IProcHandler.OnProcFinish event notification, mainly for proc event analyzing or logging purposes
+July 16, 2020
+	- Added death event audio notifications (optional), ProcRule override options for custom behavior, and functions GetProcs(IPlayer) and IsOnProc(IPlayer) for other plugins to query stored proc data
+July 15, 2020 (Full rewrite)
+	- Implemented my new Movable plugin system -> bar width is dynamically resizable, the whole display can be dragged around on the screen, and toggled on or off
+	- adds buffering to potentially stamp out extraneous or false notifications
+	- can now show multiple procs per player
+	- customizable audio notifications per proc type (ProcRule)
+	- proc counting (not yet displayed)
+	- adds the ability to capture screenshots on party procs and deaths (unfortunately no longer works properly - TH outputs a black screen)
+April 24, 2019
+	- Uses IPlayer.HeroId instead of IPlayer.BattleTagAbovePortrait to identify unique player characters, attempts to check for deaths
+February 17, 2019
+	- Fixed an issue with countdown timers stopping when players run out of range on the same level
+February 13, 2019
+	- Initial release

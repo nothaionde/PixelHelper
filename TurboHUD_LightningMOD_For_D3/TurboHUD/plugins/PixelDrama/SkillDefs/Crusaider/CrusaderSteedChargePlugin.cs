@@ -22,7 +22,7 @@ namespace Turbo.Plugins.PixelDrama.SkillDefs
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
-                .IfOnCooldown().ThenNoCastElseContinue()
+                //.IfCanCastSimple().ThenCastElseContinue()
                 .IfTrue(ctx =>
                 {
                     var skillsToWaitFor = new[]

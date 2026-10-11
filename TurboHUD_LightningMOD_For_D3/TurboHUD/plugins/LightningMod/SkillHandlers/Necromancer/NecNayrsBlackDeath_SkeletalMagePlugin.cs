@@ -1,8 +1,9 @@
-using Turbo.Plugins.glq;
+ï»¿using Turbo.Plugins.glq;
 namespace Turbo.Plugins.LightningMod
 {
     public class NecNayrsBlackDeath_SkeletalMagePlugin : AbstractSkillHandler, ISkillHandler
     {
+        public bool InvalidWhenForceMove { get; set; }
 
         public NecNayrsBlackDeath_SkeletalMagePlugin()
             : base(CastType.BuffSkill, CastPhase.AutoCast, CastPhase.Attack, CastPhase.AttackIdle)
@@ -21,7 +22,8 @@ namespace Turbo.Plugins.LightningMod
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfTrue(ctx => ctx.Skill.Rune == 3).ThenContinueElseNoCast()
-                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//×°±¸ºÚÁ­
+                .IfTrue(ctx => !InvalidWhenForceMove || !ctx.Hud.Interaction.IsHotKeySet(ActionKey.Move) || !ctx.Hud.Interaction.IsContinuousActionStarted(ActionKey.Move)).ThenContinueElseNoCast()//æŒ‰ä½å¼ºåˆ¶ç§»åŠ¨ä¸ç”Ÿæ•ˆ
+                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//è£…å¤‡é»‘é•°
                 .IfPrimaryResourceAmountIsAbove(ctx => (int)ctx.Skill.GetResourceRequirement() + 1).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
                 {
@@ -30,13 +32,13 @@ namespace Turbo.Plugins.LightningMod
                     var remaining = buff?.Active == true ? buff.TimeLeftSeconds[IconIndex] : 0.0d;
                     if (remaining < 0.5d)
                     {
-                        return true;//BUFFÐ¡ÓÚ0.5ÃëºóÊ©·Å
+                        return true;//BUFFå°äºŽ0.5ç§’åŽæ–½æ”¾
                     }
-                    else if (ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.ConventionOfElements.Sno))//ÔªËØ½ä
+                    else if (ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.ConventionOfElements.Sno))//å…ƒç´ æˆ’
                     {
                         var Coe = PublicClassPlugin.GetHighestElementLeftSecond(hud, hud.Game.Me, 2);
                         var buffSkeletalMage = PublicClassPlugin.GetBuffLeftTime(hud, Hud.Sno.SnoPowers.Necromancer_SkeletalMage.Sno, 6);
-                        return Coe > 4 && Coe < 5 && buffSkeletalMage < 5;//Àë±¬·¢»¹Ê£1ÃëÊ±ÊÍ·ÅÇÒ÷¼÷Ã·¨Ê¦Ê±¼ä²»×ã5Ãë
+                        return Coe > 4 && Coe < 5 && buffSkeletalMage < 5;//ç¦»çˆ†å‘è¿˜å‰©1ç§’æ—¶é‡Šæ”¾ä¸”éª·é«…æ³•å¸ˆæ—¶é—´ä¸è¶³5ç§’
                     }
                     return false;
                 }).ThenCastElseContinue()

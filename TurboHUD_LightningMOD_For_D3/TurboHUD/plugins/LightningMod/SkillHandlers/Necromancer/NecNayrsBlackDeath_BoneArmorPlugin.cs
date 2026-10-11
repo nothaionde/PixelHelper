@@ -1,8 +1,8 @@
-namespace Turbo.Plugins.LightningMod
+﻿namespace Turbo.Plugins.LightningMod
 {
     public class NecNayrsBlackDeath_BoneArmorPlugin : AbstractSkillHandler, ISkillHandler
     {
-
+        public bool InvalidWhenForceMove { get; set; }
         public NecNayrsBlackDeath_BoneArmorPlugin()
             : base(CastType.BuffSkill, CastPhase.AutoCast, CastPhase.Attack, CastPhase.AttackIdle)
         {
@@ -20,7 +20,8 @@ namespace Turbo.Plugins.LightningMod
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfTrue(ctx => ctx.Skill.Rune == 2).ThenContinueElseNoCast()
-                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//װ������
+                .IfTrue(ctx => !InvalidWhenForceMove || !ctx.Hud.Interaction.IsHotKeySet(ActionKey.Move) || !ctx.Hud.Interaction.IsContinuousActionStarted(ActionKey.Move)).ThenContinueElseNoCast()//按住强制移动不生效
+                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//装备黑镰
                 .IfTrue(ctx =>
                 {
                     int IconIndex = ctx.Skill.Key.GetHashCode() + 1;

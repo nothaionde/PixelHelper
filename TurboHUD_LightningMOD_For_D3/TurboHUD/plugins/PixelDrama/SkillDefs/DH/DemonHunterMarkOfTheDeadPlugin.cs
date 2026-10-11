@@ -33,7 +33,7 @@ namespace Turbo.Plugins.PixelDrama.SkillDefs
                     var isAnyUncursedMonster = Hud.Game.AliveMonsters.Any(m => (m.Rarity == ActorRarity.Boss || m.Rarity == ActorRarity.Rare || m.Rarity == ActorRarity.Champion 
                     || m.Rarity == ActorRarity.Unique || m.SnoMonster.Priority == MonsterPriority.goblin 
                     || m.SnoMonster.Priority == MonsterPriority.keywarden) &&
-                    !m.AffixSnoList.Any(a => a.Affix == MonsterAffix.Juggernaut) &&
+                    //!m.AffixSnoList.Any(a => a.Affix == MonsterAffix.Juggernaut) &&
                     !m.Invisible && !m.Invulnerable && !m.Illusion && (m.FloorCoordinate.XYZDistanceTo(cur.ToWorldCoordinate()) - m.RadiusBottom) <= 19 &&
                     !m.MarkedForDeath);
                     return isAnyUncursedMonster;

@@ -1,8 +1,9 @@
-using System.Linq;
+ï»¿using System.Linq;
 namespace Turbo.Plugins.LightningMod
 {
     public class NecNayrsBlackDeath_RevivePlugin : AbstractSkillHandler, ISkillHandler
     {
+        public bool InvalidWhenForceMove { get; set; }
         public NecNayrsBlackDeath_RevivePlugin()
             : base(CastType.SimpleSkill, CastPhase.AutoCast, CastPhase.UseWpStart, CastPhase.Move, CastPhase.Attack, CastPhase.AttackIdle)
         {
@@ -13,23 +14,24 @@ namespace Turbo.Plugins.LightningMod
         {
             base.Load(hud);
             AssignedSnoPower = Hud.Sno.SnoPowers.Necromancer_Revive;
-            //Rune = 4//¶¾·ûÎÄ
+            //Rune = 4//æ¯’ç¬¦æ–‡
             CreateCastRule()
                 .IfCanCastSkill(100, 150, 1000).ThenContinueElseNoCast()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfTrue(ctx => ctx.Skill.Rune == 4).ThenContinueElseNoCast()
-                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//×°±¸ºÚÁ­
+                .IfTrue(ctx => !InvalidWhenForceMove || !ctx.Hud.Interaction.IsHotKeySet(ActionKey.Move) || !ctx.Hud.Interaction.IsContinuousActionStarted(ActionKey.Move)).ThenContinueElseNoCast()//æŒ‰ä½å¼ºåˆ¶ç§»åŠ¨ä¸ç”Ÿæ•ˆ
+                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//è£…å¤‡é»‘é•°
                 .IfTrue(ctx=>
                 {
                     int IconIndex = ctx.Skill.Key.GetHashCode() + 1;
                     var buff = ctx.Skill.Player.Powers.GetBuff(hud.Sno.SnoPowers.NayrsBlackDeath.Sno);
                     var remaining = buff?.Active == true ? buff.TimeLeftSeconds[IconIndex] : 0.0d;
-                    bool NayrsBlackDeath = remaining < 8d;//ºÚÁ­BUFFµÄÊ£ÓàÊ±¼ä
-                    return (remaining == 0 ? true: isNoElite()) && //ºÚÁ­BUFFÃ»ÓÐÏûÊ§Ê±£¬Ð¡¹ÖºÍBOSS»ò°ÔÍõÊ±Ê©·Å£¬·ñÔò²»ÅÐ¶Ï¹ÖÎïÀàÐÍ
-                    isCorpse() && //20ÂëÄÚÓÐÊ¬Ìå
-                    NayrsBlackDeath;//ºÚÁ­BUFFµÍÓÚ8ÃëÊ£ÓàÊ±¼ä
+                    bool NayrsBlackDeath = remaining < 8d;//é»‘é•°BUFFçš„å‰©ä½™æ—¶é—´
+                    return (remaining == 0 ? true: isNoElite()) && //é»‘é•°BUFFæ²¡æœ‰æ¶ˆå¤±æ—¶ï¼Œå°æ€ªå’ŒBOSSæˆ–éœ¸çŽ‹æ—¶æ–½æ”¾ï¼Œå¦åˆ™ä¸åˆ¤æ–­æ€ªç‰©ç±»åž‹
+                    isCorpse() && //20ç å†…æœ‰å°¸ä½“
+                    NayrsBlackDeath;//é»‘é•°BUFFä½ŽäºŽ8ç§’å‰©ä½™æ—¶é—´
                 }).ThenCastElseContinue()
                 ;
         }
@@ -42,7 +44,7 @@ namespace Turbo.Plugins.LightningMod
         private bool isCorpse()
         {
             IWorldCoordinate cur = Hud.Window.CreateScreenCoordinate(Hud.Window.CursorX, Hud.Window.CursorY).ToWorldCoordinate();
-            bool isCorpse = Hud.Game.Actors.Any(a => a.SnoActor.Sno == ActorSnoEnum._p6_necro_corpse_flesh && a.FloorCoordinate.XYDistanceTo(cur) <= 20);//Êó±ê20ÂëÄÚ´æÔÚÊ¬Ìå
+            bool isCorpse = Hud.Game.Actors.Any(a => a.SnoActor.Sno == ActorSnoEnum._p6_necro_corpse_flesh && a.FloorCoordinate.XYDistanceTo(cur) <= 20);//é¼ æ ‡20ç å†…å­˜åœ¨å°¸ä½“
             return isCorpse;
         }
     }

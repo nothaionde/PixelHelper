@@ -96,7 +96,7 @@ namespace Turbo.Plugins.LightningMod
                {
                    int season = ctx.Hud.Game.Me.Hero.Season;
                    int bell = ctx.Hud.Game.Actors.Count(a => a.SnoActor.Sno == ActorSnoEnum._p74_monk_bell_waveoflight_runeb);//27赛季火钟
-                   return season == 27//仅限制27赛季
+                   return season == 34//仅限制27赛季
                   && bell == 5;
                    ;
                }).ThenCastElseContinue()

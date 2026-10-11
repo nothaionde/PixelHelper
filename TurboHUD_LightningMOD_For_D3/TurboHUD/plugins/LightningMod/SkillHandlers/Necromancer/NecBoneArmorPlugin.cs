@@ -14,6 +14,7 @@ namespace Turbo.Plugins.LightningMod
         {
             base.Load(hud);
             AssignedSnoPower = Hud.Sno.SnoPowers.Necromancer_BoneArmor;
+
             CreateCastRule()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
@@ -36,7 +37,7 @@ namespace Turbo.Plugins.LightningMod
                 }).ThenCastElseContinue()//层数不满时施放
                 .IfBuffIsAboutToExpire(10000,15000).ThenCastElseContinue()//BUFF剩余10~15秒以下时施放
                 ;
-
+            
             CreateCastRule()
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()
@@ -65,7 +66,7 @@ namespace Turbo.Plugins.LightningMod
                 .IfTrue(ctx => ctx.Skill.Player.Powers.BuffIsActive(476586) && ctx.Skill.Rune != 3).ThenCastElseContinue()//轮回镰刀时直接施放，不为骨肉相连符文
                 .IfBuffIsAboutToExpire(1000, 1500).ThenCastElseContinue()//BUFF剩余即将过期时施放
                 ;
-
+            
             CreateCastRule()//增加规则当玩家装备勾玉宝石且没有装备受罚宝石，60%CDR以上，则玩家30码内有怪就释放骨甲。
                 .IfInTown().ThenNoCastElseContinue()
                 .IfCastingIdentify().ThenNoCastElseContinue()

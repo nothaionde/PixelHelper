@@ -1,0 +1,143 @@
+MovableController manages MovableAreas, which are rendered displays that can be moved around on the 
+screen either via hotkey or drag and drop, and toggled on or off. Standalone plugins can be modified 
+to hook into this system to gain all the behaviors of movable, resizable areas.
+
+It can automatically generate configuration files to save area positions, dimensions, enabled states, and a custom string.
+As of TurboHUD v20.7.12.0+, log files cannot be generated while in games of difficulty Torment 1 or 
+higher or special areas (e.g. rifts), so please do your UI configuring in town in a lower difficulty 
+or teleport/waypoint to another area after configuration (loading screen counts as a valid logging 
+state) to trigger config file generation.
+
+Todo: 
+- add snap-to-grid option
+- add grouped area movement
+
+Changelog
+February 17, 2021
+	- removed the debug dependency to Razor.Label
+	- removed IPluginManifest dependency declaration for Razor.Click.*
+	- converted my mouse click detection and blocking implementation to use the new TurboHUD functions
+September 8, 2021
+	- implemented IPluginManifest to add plugin metadata
+July 14, 2021
+	- added custom blocking areas to the MovableArea clip checks
+July 11, 2021
+	- converted manual save to automatic save
+June 13, 2021
+	- implements ILeftBlockHandler to block left mouse clicks when interacting with MovableAreas in Edit Mode
+May 17, 2021
+	- paints MovableAreas that are attached to the cursor even if they are being dragged over obstructing UI areas
+May 8, 2021
+	- converted the manual file save hotkey action to immediately save the config file to the plugins\User directory, in addition to the usual log backup file writing
+	- edge optimization: if no Movable plugins are registered, MovableController will no longer do any other Paint checks besides drawing grid in Edit Mode
+May 6, 2021
+	- fixed exception from UIOverlapHelper when its checking functions are called before the plugin has initialized its UI references
+April 30, 2021
+	- updated ClickEventHandler to no longer have E and R set as simulate click hotkeys by default for more out-of-the-box compatibility
+April 28, 2021
+	- UIOverlapHelper reference in MovableController is now publicly readable so that Movable plugins can easily utilize it for custom UI overlap checks without having to save their own reference to it
+April 24, 2021
+	- added IMovableDeleteAreaHandler to patch in the ability to optionally notify owner IMovables of associated area deletion
+	- rewrote the code for DeleteOnDisable
+April 20, 2021
+	- fixed resizing from the left side (again)
+April 19, 2021
+	- separated ui overlap detection code into its own helper class, UIOverlapHelper
+April 17, 2021
+	- hotkeys are now filtered through the Razor.Hotkey handler and no longer require Edit Mode
+	- added a click handler system so that Movables can respond to click events that happen specifically within their movable areas while not in Edit Mode
+April 3, 2021
+	- implemented ITextLogger for delayable, queued TextLog writing
+February 1, 2021
+	- custom clipping with mail ui because it doesn't respect ClipState.BeforeClip
+	- added Journal UI to left ui check list
+	- fixed some clip detection and manual clipping issues
+January 27, 2021
+	- Movable areas can now specify a config file name, and MovableController will now write those areas' config data to the specified config file instead of the default one -> any Movable plugin can now specify its own separate config files to be generated (functionality added for PartyTracker)
+	- Movable areas can now specify a custom string value that can be used for config or whatever kind of data storage that gets saved to the config file
+January 22, 2021
+	- added mail ui to should-be-clipped-but-isn't list
+January 16, 2021
+	- separated leftuis into two categories: leftuis (covers all) and leftshortuis (covers a little less than all)
+January 14, 2021
+	- added centeruis and check inventory separately from rightuis (rightshortui)
+	- added inventory details pane to clip area detection lists
+January 9, 2021
+	- added chat text prompt to clip area detection lists
+December 27, 2020
+	- added the tooltip uielement to the clip area detection lists
+December 24, 2020
+	- stop rendering area if a text prompt (e.g. Armory save text prompt) covers it
+	- stop rendering area if a secondary menu covers it (kanai's recipes, kanai's powers selection)
+December 23, 2020
+	- stop rendering or accepting input for areas when they are underneath important, visible game menu elements
+December 20, 2020
+	- fixed resizing from the left side (again)
+December 15, 2020
+	- added the ability to restore dynamically created areas from config (needed the area name rather than the area index to be saved)
+	- deletion of temporary areas now trigger a config write
+November 29, 2020
+	- fixed Grid lines being redrawn multiple times, once for every Movable plugin
+	- shifted EditMode plugin titles that would be draw above the top of the screen to the top of the screen instead for visibility
+	- updated MyMovablePluginTemplate.txt with a clarification of which RectangleF class to use (System.Drawing, not SharpDX) and an example of checking Edit Mode state
+August 18, 2020
+	- Grid brush drawing now uses both light and dark brushes so that it shows up for all visual atmospheres
+	- Lowered the opacity of unselected area titles slightly
+August 1, 2020
+	- Fixed FixedRatio resizing calculations
+	- Added subtle placement-assist grid lines that can be toggled off and on while in Edit Mode (default hotkey: Ctrl+G)
+	- By request, implemented an Undo All hotkey
+July 28, 2020
+	- Fixed errors caused by config data if the localization of position and dimension numbers resulted in decimal points being written with commas (now it rounds to the nearest integer pixel)
+July 27, 2020
+	- Removed unused private variables
+July 26, 2020
+	- Undoing while in the middle of a resize action will now cancel the resize
+	- Renamed ModifyMode to EditMode
+July 25, 2020
+	- IMovable now extends IPlugin
+July 23, 2020
+	- Moved the code that clears area out Cursor, Resize and Hovered area globals from DeleteArea to the point at which areas are actually deleted
+July 22, 2020
+	- Added SnapTo(x,y) for implementing snap to location (x,y) behavior for area currently picked up
+	- Fixed MovableController.DeleteArea(area) now clears area out of Cursor, Resize and Hovered area globals
+	- Added different outline color for DeleteOnDisable flagged areas
+	- Fixed Ctrl+C to be able to put down area when outside of Modify mode
+July 21, 2020
+	- Added area.SaveToConfig check to ToggleArea before flagging for a config update
+	- Fixed missing drag resizing checks on put down for preventing negative dimensions
+	- Removed key event passing to IMovableKeyEventHandler (too narrow of a use case to be worthwhile?)
+July 20, 2020
+	- Added a reference to MovableController in PaintArea function signature so that it is less complicated for PaintArea code to check whether or not the specified MovableArea is on the cursor, being resized or hovered and draw its contents accordingly
+	- Undo now can be applied to the current area picked up on the cursor
+	- Added IMovableKeyEventHandler for IMovable plugins that want to watch for custom key events when selected in Modify Mode
+	- Added MovableController.DeleteArea with a deletion queue
+July 19, 2020
+	- Removed unused variable AllowDragAndDrop
+	- Fixed hotkey selection of next and previous movable area at cursor
+July 18, 2020
+	- Clear HoveredPluginArea when Outline mode is toggled off
+	- Fixed NullPointerException that happens when TH is loaded while in menus and then you enter a game (note: initialization has to wait until you are in a game for the first time, otherwise OnRegister calls that reference existing UI element positions may return 0 because TH hasn't started collecting data about their positions yet)
+	- Fixed queued config file generation not triggering after valid logging conditions are detected
+	- Added mouse hint symbols for ResizeMode.Horizontal and ResizeMode.Vertical
+	- Moved Changelog into its own file because TH was detecting its content as suspicious code
+July 17, 2020
+	- Changed Resizable on/off bool into a ResizeMode setting to include special calculations for Fixed Ratio, Horizonal or Vertical locked resizing
+	- Added highlighting behavior for improved outline selection visibility
+July 15, 2020
+	- Automatic config file generation (if enabled) now attempts to save the log file again when a valid logging state is detected (not in a special area or difficulty above Torment 1 or in a game) if the original generation was triggered in an invalid logging state
+July 14, 2020
+	- Added full history Undo for moving and resizing MovableAreas
+July 13, 2020
+	- Added the ability to resize MovableAreas by dragging the bottom left or bottom right corners
+July 12, 2020
+	- Added the ability for MovableAreas to be drawn at different clipstates, not just BeforeClip
+July 11, 2020
+	- Removed the dependences on extending BasePlugin and implementing ICustomizer to streamline implementation in other plugins
+	- Added config fields for width and height modification
+July 2, 2020
+	- Renamed the Floater framework to the Movable framework
+	- separated click detection into its own generic handler
+	- changed the config file generation to use ConfigFileName as the class name
+April 17, 2020
+	- Initial release

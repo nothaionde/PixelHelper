@@ -1,9 +1,9 @@
-using Turbo.Plugins.glq;
+ï»¿using Turbo.Plugins.glq;
 namespace Turbo.Plugins.LightningMod
 {
     public class NecNayrsBlackDeath_CommandSkeletonsPlugin : AbstractSkillHandler, ISkillHandler
     {
-
+        public bool InvalidWhenForceMove { get; set; }
         public NecNayrsBlackDeath_CommandSkeletonsPlugin()
             : base(CastType.BuffSkill, CastPhase.AutoCast, CastPhase.Attack, CastPhase.AttackIdle)
         {
@@ -21,22 +21,23 @@ namespace Turbo.Plugins.LightningMod
                 .IfCastingPortal().ThenNoCastElseContinue()
                 .IfOnCooldown().ThenNoCastElseContinue()
                 .IfTrue(ctx => ctx.Skill.Rune == 3).ThenContinueElseNoCast()
-                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//×°±¸ºÚÁ­
+                .IfTrue(ctx => !InvalidWhenForceMove || !ctx.Hud.Interaction.IsHotKeySet(ActionKey.Move) || !ctx.Hud.Interaction.IsContinuousActionStarted(ActionKey.Move)).ThenContinueElseNoCast()//æŒ‰ä½å¼ºåˆ¶ç§»åŠ¨ä¸ç”Ÿæ•ˆ
+                .IfSpecificBuffIsActive(hud.Sno.SnoPowers.NayrsBlackDeath, 0).ThenContinueElseNoCast()//è£…å¤‡é»‘é•°
                 .IfPrimaryResourceAmountIsAbove(ctx => (int)ctx.Skill.GetResourceRequirement() + 1).ThenContinueElseNoCast()
                 .IfTrue(ctx =>
                 {
-                    if (ctx.Hud.Game.SelectedMonster2 == null) return false;//Ã»ÓĞÄ¿±êÊ±²»Ê¹ÓÃ
+                    if (ctx.Hud.Game.SelectedMonster2 == null) return false;//æ²¡æœ‰ç›®æ ‡æ—¶ä¸ä½¿ç”¨
                     int IconIndex = ctx.Skill.Key.GetHashCode() + 1;
                     var buff = ctx.Skill.Player.Powers.GetBuff(hud.Sno.SnoPowers.NayrsBlackDeath.Sno);
                     var remaining = buff?.Active == true ? buff.TimeLeftSeconds[IconIndex] : 0.0d;
                     if (remaining < 0.5d)
                     {
-                        return true;//BUFFĞ¡ÓÚ0.5ÃëºóÊ©·Å
+                        return true;//BUFFå°äº0.5ç§’åæ–½æ”¾
                     }
-                    else if (ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.ConventionOfElements.Sno))//ÔªËØ½ä
+                    else if (ctx.Skill.Player.Powers.BuffIsActive(hud.Sno.SnoPowers.ConventionOfElements.Sno))//å…ƒç´ æˆ’
                     {
                         var Coe = PublicClassPlugin.GetHighestElementLeftSecond(hud, hud.Game.Me, 2);
-                        return remaining < Coe;//Ê£ÓàBUFF²»×ã¸²¸Ç±¬·¢Ê±¼äÊ±Ê©·Å
+                        return remaining < Coe;//å‰©ä½™BUFFä¸è¶³è¦†ç›–çˆ†å‘æ—¶é—´æ—¶æ–½æ”¾
                     }
                     return false;
                 }).ThenCastElseContinue()

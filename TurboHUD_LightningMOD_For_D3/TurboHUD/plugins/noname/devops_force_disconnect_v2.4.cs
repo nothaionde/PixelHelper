@@ -225,6 +225,9 @@ namespace Turbo.Plugins.User.Devops
             public static bool town_teleport_casted = false; //Don't change.
             public static bool key_count_initialized = false; //Don't change.
             public static bool key_count_increased = false; //Don't change.
+            // PixelBob
+            public static long key_check_counter = 0; //Don't change.
+            // PixelBob 
             public static long start_key_count = 0; //Don't change.
             public static List<string> xp_pool_markers = new List<string>(); //Don't change.
             public static bool pool_markers_initialized = false; //Don't change.
@@ -753,9 +756,13 @@ namespace Turbo.Plugins.User.Devops
                             && Hud.Game.Me.Materials.GreaterRiftKeystone > Globals.start_key_count
                         )
                         {
-
-                            Utilities.write_debug_log(Hud, "Nephalem rift disconnect triggered.", false); //DEBUG-LOG
-                            Globals.key_count_increased = true;
+                            Globals.key_check_counter++;
+                            if (Globals.key_check_counter >= 60)
+                            {
+                                Utilities.write_debug_log(Hud, "Nephalem rift disconnect triggered.", false); 
+                                Globals.key_count_increased = true;
+                                Globals.key_check_counter = 0;
+                            }
 
                         }
 

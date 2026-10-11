@@ -73,6 +73,7 @@
         private readonly List<(IItem item, IUiElement slotElement)> reusableGemSlots =
             new List<(IItem item, IUiElement slotElement)>();
 
+        private IUiElement item1 { get; set; }
         private int UpgradeTimes;
         private IWatch _timer;
         private DateTime lastActionTime = DateTime.MinValue;
@@ -103,6 +104,8 @@
                 null,
                 null
             );
+            item1 = Hud.Render.RegisterUiElement("Root.NormalLayer.vendor_dialog_mainPage.riftReward_dialog.LayoutRoot.gemUpgradePane.items_list._content._stackpanel._tilerow0._item0.Item", null, null);
+
             _timer = Hud.Time.CreateWatch();
         }
 
@@ -151,6 +154,22 @@
                 return;
 
             var rect = targetGem.slotElement.Rectangle;
+
+            bool isGemInSlot1_1 = Hud.Inventory.ItemsInInventory.Any(x => x.InventoryX == 0 && x.InventoryY == 0 && x.IsLegendary && x.SnoItem.MainGroupCode == "gems_unique");
+
+            if (isGemInSlot1_1)
+            {
+                var gemInInventory1_1 = Hud.Inventory.ItemsInInventory.FirstOrDefault(x => x.InventoryX == 0 && x.InventoryY == 0);
+                if (gemInInventory1_1 != null)
+                {
+                    var preferredGem = reusableGemSlots.FirstOrDefault(t => t.item.AcdId == gemInInventory1_1.AcdId && IsSuitable(t.item));
+                    if (preferredGem.item != null)
+                    {
+                        rect = preferredGem.slotElement.Rectangle;
+                    }
+                }
+            }
+
             int tempX = Hud.Window.CursorX;
             int tempY = Hud.Window.CursorY;
 

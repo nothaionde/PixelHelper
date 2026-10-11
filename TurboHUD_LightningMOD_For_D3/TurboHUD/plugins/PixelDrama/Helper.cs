@@ -129,6 +129,34 @@
                 watermarkEnabled.DrawText("Pixel Helper: On. F5 To Turn Off! ", 4, Hud.Window.Size.Height * 0.966f);
             else
                 watermarkDisabled.DrawText("Pixel Helper: Off. F5 To Turn On! ", 4, Hud.Window.Size.Height * 0.966f);
+
+            var comboBuff = Hud.Game.Me.Powers.GetBuff(Hud.Sno.SnoPowers.Monk_Passive_CombinationStrike.Sno);
+
+            if (comboBuff != null && comboBuff.Active)
+            {
+                string info = "Combination Strike Buff Details:\n";
+
+                // Проходим по всем возможным индексам иконок баффа (обычно от 0 до 7)
+                for (int i = 0; i < comboBuff.TimeLeftSeconds.Length; i++)
+                {
+                    double timeLeft = comboBuff.TimeLeftSeconds[i];
+                    int count = comboBuff.IconCounts[i];
+
+                    // Выводим только те индексы, которые сейчас реально активны в игре
+                    if (count > 0 || timeLeft > 0)
+                    {
+                        info += $"[Index {i}] Time Left: {timeLeft:F2}s | Count: {count}\n";
+                    }
+                }
+
+                // Выводим собранную информацию на экран
+                debugFont.DrawText(info, 4, Hud.Window.Size.Height * 0.166f);
+            }
+            else
+            {
+                // Если баффа вообще нет на персонаже
+                debugFont.DrawText("Combination Strike: NOT ACTIVE (Hit monsters manually)", 4, Hud.Window.Size.Height * 0.166f);
+            }
         }
 
         public void OnNewArea(bool newGame, ISnoArea area)
